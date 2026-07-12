@@ -20,14 +20,7 @@ An advanced, responsive, AI-powered resume builder built with modern design prin
 * Automatically scales the preview container (`scale(S)`) dynamically if contents exceed the A4 boundary (`1040px`).
 * Ensures zero overflow, keeping PDF exports and prints looking perfect on **exactly one page** of A4 paper.
 
-### 🤖 3. Built-In Gemini AI Copilot (with Offline Fallbacks)
-* **AI Summary Generator**: Drafts punchy, recruiter-optimized professional summaries.
-* **STAR-Method Bullet Optimizer**: Converts simple task descriptions into quantifiable metrics-driven achievements.
-* **ATS Recruiter Scanner**: Scans keywords and gives alignment scores (0-100) with detailed optimization tips.
-* **AI Cover Letter Writer & Enhancer**: Instantly creates and refines cover letters.
-* **🔌 Offline Resiliency**: Seamlessly switches to a local rule-based mock engine if the Gemini API key is missing or invalid so the app never throws errors.
-
-### 🐇 4. CodeRabbit AI Workspace Widget
+### 🐇 3. CodeRabbit AI Workspace Widget
 * Features a diagnostic widget to audit JSON schema formats, automatically correcting trailing commas, missing categories, and unquoted fields on copy-paste.
 
 ---
