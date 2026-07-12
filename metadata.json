@@ -1,0 +1,6 @@
+{
+  "name": "CareerWith",
+  "description": "A premium, ATS-focused AI Resume Builder with a clean white-and-yellow layout and intelligent features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

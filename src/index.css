@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --shadow-neomorphic: 3px 3px 6px rgba(0, 0, 0, 0.08), -3px -3px 6px rgba(255, 255, 255, 0.9);
+  --shadow-neomorphic-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.08), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+}
+
+/* Hide print-only elements by default in browser view */
+.print-only {
+  display: none !important;
+}
+
+/* Print utilities for clean PDF download */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Reset grid layouts and spacing during print */
+  .grid, [class*="grid-cols-"] {
+    display: block !important;
+    gap: 0 !important;
+  }
+  .xl\:col-span-7, .lg\:col-span-7 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .print-wrapper {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0 !important;
+  }
+
+  .print-container {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Custom scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Dedicated premium scrollbar for roles container */
+.roles-scroll-container::-webkit-scrollbar {
+  width: 5px;
+}
+.roles-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 99px;
+  margin: 4px 0;
+}
+.roles-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.3); /* stone-500 with opacity */
+  border-radius: 99px;
+}
+.roles-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 113, 108, 0.6);
+}
+
+/* Neomorphism styling for Wizard fields and containers */
+.xl\:col-span-5 input[type="text"],
+.xl\:col-span-5 input[type="email"],
+.xl\:col-span-5 input[type="tel"],
+.xl\:col-span-5 input[type="url"],
+.xl\:col-span-5 select,
+.xl\:col-span-5 textarea {
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.04), -3px -3px 6px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(228, 228, 231, 0.6);
+  background-color: #F8FAFC;
+  transition: all 0.25s ease;
+}
+
+.xl\:col-span-5 input[type="text"]:focus,
+.xl\:col-span-5 input[type="email"]:focus,
+.xl\:col-span-5 input[type="tel"]:focus,
+.xl\:col-span-5 input[type="url"]:focus,
+.xl\:col-span-5 select:focus,
+.xl\:col-span-5 textarea:focus {
+  background-color: #ffffff !important;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.8) !important;
+  border-color: #FACC15 !important;
+}
+
+/* Neomorphic tabs/buttons */
+.shadow-neomorphic {
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.08), -3px -3px 6px rgba(255, 255, 255, 0.9) !important;
+}
+.shadow-neomorphic-inset {
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.08), inset -2px -2px 5px rgba(255, 255, 255, 0.9) !important;
+}
+
+
