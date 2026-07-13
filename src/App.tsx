@@ -136,8 +136,18 @@ const validateAndSanitizeResume = (data: any): ResumeData => {
   };
 };
 
+const SLOGANS = [
+  "Your career journey starts with a smile.",
+  "Let your resume make them smile, let your work make them stay.",
+  "Every professional milestone begins with a smile and a step forward.",
+  "Smile! Your dream career is just one click away."
+];
+
 export default function App() {
+  const [showEntrancePage, setShowEntrancePage] = useState<boolean>(true);
+  const [selectedSloganIndex, setSelectedSloganIndex] = useState<number>(0);
   const [resume, setResume] = useState<ResumeData>(INITIAL_RESUME);
+
   const [activeTab, setActiveTab] = useState<string>("personal");
   const [resumeStyle, setResumeStyle] = useState<"modern" | "classic" | "tech" | "creative" | "executive" | "academic" | "chic" | "midnight" | "profile-photo" | "metro" | "editorial" | "outline" | "brutalist" | "slate" | "healthcare" | "future">("modern");
   
@@ -1517,7 +1527,125 @@ export default function App() {
   const textAccent = resumeStyle === "midnight" ? "text-yellow-400" : resumeStyle === "future" ? "text-violet-400" : resumeStyle === "healthcare" ? "text-emerald-600" : "text-yellow-600";
   const borderCol = isDarkTheme ? "border-stone-800" : "border-stone-200";
 
+  if (showEntrancePage) {
+    return (
+      <div className="min-h-screen bg-gold-stone-flow flex flex-col justify-between items-center p-6 md:p-12 relative overflow-hidden font-sans">
+        {/* Decorative elements */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/40 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-stone-200/20 rounded-full blur-[100px] pointer-events-none" />
+
+        {/* Top Header */}
+        <header className="w-full max-w-6xl flex justify-between items-center z-10 mb-8">
+          <div className="flex items-center gap-2 bg-white/40 backdrop-blur-md px-4 py-2 rounded-2xl border border-stone-200/40 shadow-sm">
+            <div className="bg-white rounded-xl p-1.5 flex items-center justify-center shadow-sm border border-stone-100">
+              <FileText className="h-5 w-5 text-yellow-500 stroke-[2.5]" />
+            </div>
+            <span className="text-stone-850 font-extrabold tracking-tight text-lg">
+              CareerWith
+            </span>
+          </div>
+          <button
+            onClick={() => setShowEntrancePage(false)}
+            className="text-stone-700 text-xs font-black bg-white/40 hover:bg-white/60 backdrop-blur-md px-4.5 py-2.5 rounded-2xl border border-stone-200/40 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 flex items-center gap-1.5"
+          >
+            Direct Access <ChevronRight className="h-3.5 w-3.5 text-yellow-600" />
+          </button>
+        </header>
+
+        {/* Main Content Area */}
+        <main className="grow flex flex-col items-center justify-center w-full max-w-4xl text-center z-10 my-auto py-8">
+          {/* Glassmorphic Slogan Display Container */}
+          <div className="gold-stone-border-glow bg-white/85 backdrop-blur-2xl rounded-[36px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] p-8 md:p-12 lg:p-16 max-w-3xl w-full mx-auto transform transition-all duration-500 hover:scale-[1.01] border border-white/60">
+            {/* Smile Badge */}
+            <div className="inline-flex items-center gap-1.5 bg-yellow-100 border border-yellow-250 text-yellow-800 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-6 shadow-sm">
+              <span>😊</span> Smile Slogan Theme
+            </div>
+
+            {/* Glowing Slogan Text */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-black leading-tight tracking-tight mb-8 font-sans px-2">
+              <span className="text-gold-stone-glow drop-shadow-sm select-none">
+                "{SLOGANS[selectedSloganIndex]}"
+              </span>
+            </h1>
+
+            {/* Selector Dots / Tabs to change slogans */}
+            <div className="flex flex-col items-center gap-3 mb-10">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-stone-400">
+                Choose Your Inspiration
+              </span>
+              <div className="flex justify-center gap-2">
+                {SLOGANS.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedSloganIndex(index)}
+                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      selectedSloganIndex === index
+                        ? "w-8 bg-gradient-to-r from-yellow-500 to-amber-600 shadow-md"
+                        : "w-2.5 bg-stone-250 hover:bg-stone-300"
+                    }`}
+                    title={`Slogan variation ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Main Interactive Button */}
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+              <button
+                onClick={() => setShowEntrancePage(false)}
+                className="gold-stone-button w-full sm:w-auto px-8 py-4.5 rounded-2xl font-black text-sm tracking-wide shadow-lg flex items-center justify-center gap-3 cursor-pointer select-none active:scale-95 duration-150 animate-pulse"
+              >
+                <Sparkles className="h-4.5 w-4.5 text-white fill-white/20 animate-pulse" />
+                Build My Resume Now
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Feature Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mt-12">
+            {[
+              {
+                icon: <Wand2 className="h-5 w-5 text-yellow-500 stroke-[2]" />,
+                title: "100+ Career Roles",
+                desc: "Auto-generate professional tailored content in seconds."
+              },
+              {
+                icon: <TrendingUp className="h-5 w-5 text-amber-500 stroke-[2]" />,
+                title: "ATS Score Scanner",
+                desc: "Scan and optimize resume matching keyword density."
+              },
+              {
+                icon: <FileText className="h-5 w-5 text-yellow-600 stroke-[2]" />,
+                title: "AI Cover Letter",
+                desc: "Draft role-specific matching cover letters instantly."
+              }
+            ].map((feat, idx) => (
+              <div
+                key={idx}
+                className="bg-white/50 backdrop-blur-md border border-stone-200/50 rounded-2xl p-5 text-left text-stone-800 shadow-sm hover:bg-white/80 transition-all duration-300"
+              >
+                <div className="bg-stone-50 rounded-xl p-2 w-fit mb-3 flex items-center justify-center border border-stone-200/40">
+                  {feat.icon}
+                </div>
+                <h3 className="text-sm font-black tracking-tight mb-1 text-stone-900">{feat.title}</h3>
+                <p className="text-[11px] text-stone-500 leading-normal font-semibold">{feat.desc}</p>
+              </div>
+            ))}
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="w-full max-w-6xl text-center z-10 mt-8">
+          <p className="text-xs text-stone-600 font-semibold tracking-wide flex items-center justify-center gap-1.5">
+            Designed for professional success 🚀
+          </p>
+        </footer>
+      </div>
+    );
+  }
+
   return (
+
     <div className="min-h-screen bg-[#F0F2F5] text-stone-850 font-sans antialiased selection:bg-yellow-300 selection:text-stone-900 relative overflow-x-hidden">
       {/* Liquid Glass ambient background blobs */}
       <div className="absolute top-20 left-10 w-96 h-96 bg-purple-300/20 rounded-full blur-[100px] pointer-events-none z-0" />
@@ -1561,6 +1689,15 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setShowEntrancePage(true)}
+              className="flex items-center gap-2 text-xs font-bold bg-white text-stone-700 hover:bg-stone-50 px-3 py-2 rounded-xl shadow-neomorphic border border-stone-200/40 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+            >
+              <span className="p-1 rounded-lg bg-stone-50 text-stone-600 shadow-neomorphic border border-white/60 flex items-center justify-center shrink-0">
+                <span className="text-xs">🏠</span>
+              </span>
+              Home Screen
+            </button>
             <button
               onClick={() => {
                 setJsonCodeText(JSON.stringify(resume, null, 2));
