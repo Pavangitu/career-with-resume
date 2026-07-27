@@ -1,12 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --shadow-neomorphic: 3px 3px 6px rgba(0, 0, 0, 0.08), -3px -3px 6px rgba(255, 255, 255, 0.9);
-  --shadow-neomorphic-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.08), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+  --shadow-neomorphic: 3px 3px 6px rgba(92, 32, 24, 0.06), -3px -3px 6px rgba(255, 255, 255, 0.9);
+  --shadow-neomorphic-inset: inset 2px 2px 5px rgba(92, 32, 24, 0.06), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+  
+  --color-petra-blue: #4285F4;
+  --color-petra-brown: #5C2018;
+  --color-petra-terracotta: #BC4639;
+  --color-petra-sand: #D4A59A;
+  --color-petra-ivory: #F3E0DC;
 }
 
 /* Hide print-only elements by default in browser view */
@@ -120,7 +126,7 @@
 .xl\:col-span-5 textarea:focus {
   background-color: #ffffff !important;
   box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.8) !important;
-  border-color: #FACC15 !important;
+  border-color: var(--color-petra-blue) !important;
 }
 
 /* Neomorphic tabs/buttons */
@@ -197,6 +203,253 @@
   box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
   transform: translateY(-2px);
 }
+
+/* Glassmorphism styling */
+.bg-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .bg-glass {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Premium Slate-Indigo Gradient */
+.bg-slate-indigo-gradient {
+  background: radial-gradient(circle at 0% 0%, #0f172a 0%, #090d16 100%);
+}
+
+.bg-professional-hero {
+  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 80%);
+}
+
+/* Modern Gradient Text */
+.text-indigo-glow {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Clean, modern glass panels */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Interactive Card Effects */
+.hover-card-trigger {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-card-trigger:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.dark .hover-card-trigger:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Code editor line numbers and gutter styling */
+.code-editor-textarea {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  background-color: #faf9f6;
+  color: #1e293b;
+  tab-size: 2;
+}
+
+.dark .code-editor-textarea {
+  background-color: #0b0f19;
+  color: #e2e8f0;
+}
+
+.code-gutter {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  user-select: none;
+  text-align: right;
+  padding-right: 12px;
+  color: #94a3b8;
+  border-right: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .code-gutter {
+  color: #475569;
+  border-right: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* Dark mode generic overrides */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #090d16 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Smooth zoom transition */
+.resume-preview-container-zoom {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Liquid Glass Background Animations */
+@keyframes float-blob-1 {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(40px, -60px) scale(1.2);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.85);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes float-blob-2 {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-50px, 50px) scale(0.8);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes float-blob-3 {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  40% {
+    transform: translate(60px, 30px) scale(1.25);
+  }
+  80% {
+    transform: translate(-40px, -50px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob-1 {
+  animation: float-blob-1 18s infinite alternate ease-in-out;
+}
+
+.animate-blob-2 {
+  animation: float-blob-2 15s infinite alternate ease-in-out;
+}
+
+.animate-blob-3 {
+  animation: float-blob-3 20s infinite alternate ease-in-out;
+}
+
+/* Liquid Glass Background Elements */
+.liquid-glass-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.liquid-glass-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(100px) saturate(170%);
+  -webkit-backdrop-filter: blur(100px) saturate(170%);
+  background: rgba(243, 224, 220, 0.45);
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.dark .liquid-glass-overlay {
+  background: rgba(9, 13, 22, 0.65) !important;
+  backdrop-filter: blur(100px) saturate(140%) !important;
+}
+
+/* Glass-Neomorphic Icon Containers */
+.glass-neomorphic-icon {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 4px 4px 8px rgba(92, 32, 24, 0.12), -4px -4px 8px rgba(255, 255, 255, 0.9),
+              inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer;
+}
+
+.glass-neomorphic-icon:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 6px 6px 12px rgba(92, 32, 24, 0.16), -6px -6px 12px rgba(255, 255, 255, 1),
+              inset 2px 2px 3px rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.glass-neomorphic-icon:active {
+  transform: scale(0.95) !important;
+  box-shadow: inset 3px 3px 6px rgba(92, 32, 24, 0.1), inset -3px -3px 6px rgba(255, 255, 255, 0.8) !important;
+}
+
+.dark .glass-neomorphic-icon {
+  background: rgba(15, 23, 42, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25), -4px -4px 10px rgba(255, 255, 255, 0.03),
+              inset 1px 1px 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .glass-neomorphic-icon:hover {
+  background: rgba(15, 23, 42, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.35), -6px -6px 14px rgba(255, 255, 255, 0.05),
+              inset 2px 2px 2px rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .glass-neomorphic-icon:active {
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.35), inset -3px -3px 6px rgba(255, 255, 255, 0.02) !important;
+}
+
+
 
 
 

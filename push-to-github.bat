@@ -24,7 +24,7 @@ git add .
 
 :: Commit files
 echo [4/5] Committing changes...
-git commit -m "Initial commit: Enriched domains, A4 print scaling, CodeRabbit and AI fallback engine"
+git commit -m "Update: Fix template selection presets, make career target cards clickable, style glass-neomorphic icons, and add animated liquid glass background with template preview images"
 
 :: Set branch and push
 echo [5/5] Pushing to GitHub (main branch)...

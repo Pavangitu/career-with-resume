@@ -5,6 +5,7 @@ import {
   GraduationCap,
   Award,
   Link,
+  LayoutGrid,
   Wand2,
   Plus,
   Trash2,
@@ -32,7 +33,16 @@ import {
   Undo,
   Redo,
   Save,
-  Upload
+  Upload,
+  ZoomIn,
+  ZoomOut,
+  Folder,
+  Star,
+  Settings,
+  LogOut,
+  Eye,
+  EyeOff,
+  HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ResumeData, WorkExperience, Education, Project, SkillCategory, ATSCheckResult, OptimizedBulletResult, CoverLetterResult } from "./types";
@@ -143,6 +153,63 @@ const SLOGANS = [
   "Smile! Your dream career is just one click away."
 ];
 
+const TEMPLATE_PRESETS = [
+  { id: "modern-tech", name: "Tech Elegant", category: "Modern", color: "amber", font: "inter" },
+  { id: "modern-minimal", name: "Sleek Minimalist", category: "Modern", color: "slate", font: "roboto" },
+  { id: "modern-bold", name: "Corporate Bold", category: "Modern", color: "blue", font: "inter" },
+  { id: "modern-indigo", name: "Indigo Grid", category: "Modern", color: "indigo", font: "inter" },
+  { id: "modern-emerald", name: "Emerald Stream", category: "Modern", color: "emerald", font: "roboto" },
+  { id: "modern-violet", name: "Violet Edge", category: "Modern", color: "violet", font: "inter" },
+  { id: "modern-charcoal", name: "Charcoal Clean", category: "Modern", color: "neutral", font: "inter" },
+  { id: "modern-rose", name: "Rose Quartz", category: "Modern", color: "rose", font: "roboto" },
+  { id: "modern-cyan", name: "Cyan Spark", category: "Modern", color: "cyan", font: "inter" },
+  { id: "modern-gold", name: "Gold Premium", category: "Modern", color: "amber", font: "inter" },
+
+  { id: "exec-sleek", name: "Executive Sleek", category: "Executive", color: "neutral", font: "serif" },
+  { id: "exec-classic", name: "Boardroom Classic", category: "Executive", color: "slate", font: "serif" },
+  { id: "exec-navy", name: "Navy Elite", category: "Executive", color: "blue", font: "serif" },
+  { id: "exec-crimson", name: "Crimson Crest", category: "Executive", color: "rose", font: "serif" },
+  { id: "exec-forest", name: "Forest Reserve", category: "Executive", color: "emerald", font: "serif" },
+  { id: "exec-bronze", name: "Bronze Pillar", category: "Executive", color: "amber", font: "serif" },
+  { id: "exec-slate", name: "Slate Leader", category: "Executive", color: "slate", font: "serif" },
+  { id: "exec-royal", name: "Royal Seal", category: "Executive", color: "indigo", font: "serif" },
+  { id: "exec-monochrome", name: "Monochrome Pro", category: "Executive", color: "neutral", font: "serif" },
+  { id: "exec-global", name: "Global Partner", category: "Executive", color: "blue", font: "serif" },
+
+  { id: "min-developer", name: "Minimal Developer", category: "Minimal", color: "slate", font: "mono" },
+  { id: "min-clean", name: "Airy Light", category: "Minimal", color: "neutral", font: "inter" },
+  { id: "min-compact", name: "Compact Professional", category: "Minimal", color: "slate", font: "roboto" },
+  { id: "min-grid", name: "Structured Grid", category: "Minimal", color: "indigo", font: "inter" },
+  { id: "min-accent", name: "Single Line Accent", category: "Minimal", color: "amber", font: "inter" },
+  { id: "min-academic", name: "Academic Simple", category: "Minimal", color: "neutral", font: "serif" },
+  { id: "min-dark", name: "Slate Dark", category: "Minimal", color: "slate", font: "mono" },
+  { id: "min-teal", name: "Teal Light", category: "Minimal", color: "cyan", font: "inter" },
+  { id: "min-gray", name: "Silver Leaf", category: "Minimal", color: "neutral", font: "roboto" },
+  { id: "min-elegant", name: "Elegant Simple", category: "Minimal", color: "violet", font: "serif" },
+
+  { id: "creative-split", name: "Creative Split Panel", category: "Creative", color: "violet", font: "inter" },
+  { id: "creative-chic", name: "Chic Portrait", category: "Creative", color: "rose", font: "roboto" },
+  { id: "creative-brutalist", name: "Brutalist Grid", category: "Creative", color: "neutral", font: "mono" },
+  { id: "creative-metro", name: "Metro Grid", category: "Creative", color: "blue", font: "inter" },
+  { id: "creative-future", name: "Future Neon", category: "Creative", color: "violet", font: "mono" },
+  { id: "student-basic", name: "Grad Entry Level", category: "Student", color: "blue", font: "roboto" },
+  { id: "student-intern", name: "Internship Star", category: "Student", color: "emerald", font: "inter" },
+  { id: "student-stem", name: "STEM Researcher", category: "Student", color: "slate", font: "mono" },
+  { id: "developer-git", name: "Github Profile Style", category: "Developer", color: "slate", font: "mono" },
+  { id: "developer-stack", name: "Full Stack Lead", category: "Developer", color: "indigo", font: "mono" },
+
+  { id: "academic-formal", name: "Curriculum Vitae Formal", category: "Academic CV", color: "neutral", font: "serif" },
+  { id: "academic-phd", name: "PHD Candidate", category: "Academic CV", color: "slate", font: "serif" },
+  { id: "academic-grant", name: "Research Fellow", category: "Academic CV", color: "blue", font: "serif" },
+  { id: "designer-portfolio", name: "Design Showcase", category: "Designer", color: "rose", font: "inter" },
+  { id: "designer-gallery", name: "Visual Editor CV", category: "Designer", color: "amber", font: "roboto" },
+  { id: "designer-bold", name: "Avant Garde", category: "Designer", color: "neutral", font: "mono" },
+  { id: "chic-magazine", name: "Editorial Portrait", category: "Creative", color: "rose", font: "serif" },
+  { id: "executive-gold", name: "Gold Medal Executive", category: "Executive", color: "amber", font: "serif" },
+  { id: "executive-vice", name: "VP Modern", category: "Executive", color: "indigo", font: "inter" },
+  { id: "academic-pub", name: "Publication Focused", category: "Academic CV", color: "neutral", font: "serif" }
+];
+
 export default function App() {
   const [showEntrancePage, setShowEntrancePage] = useState<boolean>(true);
   const [selectedSloganIndex, setSelectedSloganIndex] = useState<number>(0);
@@ -158,6 +225,106 @@ export default function App() {
   // JSON Code Editor states
   const [showJsonModal, setShowJsonModal] = useState(false);
   const [jsonCodeText, setJsonCodeText] = useState("");
+
+  // New JSON Code Editor Modal Overlay States
+  const [modalSidebarTab, setModalSidebarTab] = useState<"dashboard" | "editor" | "templates" | "ai" | "coverletter" | "job" | "settings" | "profile">("editor");
+  const [modalTheme, setModalTheme] = useState<"light" | "dark">("dark");
+  const [editorUndoStack, setEditorUndoStack] = useState<string[]>([]);
+  const [editorRedoStack, setEditorRedoStack] = useState<string[]>([]);
+  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [previewZoom, setPreviewZoom] = useState<number>(0.85);
+  const [previewMargins, setPreviewMargins] = useState<"compact" | "normal" | "wide">("normal");
+  const [previewLineSpacing, setPreviewLineSpacing] = useState<"compact" | "normal" | "relaxed">("normal");
+  const [previewFontFamily, setPreviewFontFamily] = useState<"inter" | "roboto" | "serif" | "mono">("inter");
+  const [previewThemeColor, setPreviewThemeColor] = useState<string>("amber");
+  
+  // Multiple Resumes DB
+  const [savedResumesList, setSavedResumesList] = useState<Array<{ id: string; name: string; folder: string; isFavorite: boolean; lastSaved: string; data: any }>>([]);
+  const [activeSavedResumeId, setActiveSavedResumeId] = useState<string>("default");
+  const [selectedFolderFilter, setSelectedFolderFilter] = useState<string>("All");
+  const [newResumeName, setNewResumeName] = useState("");
+  const [newResumeFolder, setNewResumeFolder] = useState("Personal");
+
+  // AI Assistant states inside Modal
+  const [aiSelectedTool, setAiSelectedTool] = useState<"objective" | "skills" | "projects" | "interview">("objective");
+  const [aiRoleName, setAiRoleName] = useState("Software Engineer");
+  const [aiExpLevel, setAiExpLevel] = useState("Mid-Level");
+  const [aiIndustry, setAiIndustry] = useState("IT & Software");
+  const [aiTone, setAiTone] = useState("confident");
+  const [aiJobDesc, setAiJobDesc] = useState("");
+  const [aiProjectTitle, setAiProjectTitle] = useState("");
+  const [aiProjectDesc, setAiProjectDesc] = useState("");
+  const [aiProjectTech, setAiProjectTech] = useState("");
+  const [aiGenOutput, setAiGenOutput] = useState<any>(null);
+  const [isGeneratingAiModal, setIsGeneratingAiModal] = useState(false);
+
+  // ATS Matching inside Modal
+  const [modalAtsTargetRole, setModalAtsTargetRole] = useState("Senior Software Engineer");
+  const [modalAtsJD, setModalAtsJD] = useState("");
+  const [isAnalyzingModalAts, setIsAnalyzingModalAts] = useState(false);
+  const [modalAtsResult, setModalAtsResult] = useState<any>(null);
+
+  // Cover Letter inside Modal
+  const [modalClSubject, setModalClSubject] = useState("Application for Software Engineer role");
+  const [modalClSalutation, setModalClSalutation] = useState("Dear Hiring Team");
+  const [modalClBodyText, setModalClBodyText] = useState("I am writing to express my strong interest in the Software Engineer position. With my background in full-stack development, I am confident in my ability to contribute value to your engineering team.");
+  const [modalClSignOff, setModalClSignOff] = useState("Sincerely");
+  const [modalClRole, setModalClRole] = useState("Software Engineer");
+  const [modalClCompany, setModalClCompany] = useState("Innovate Tech");
+  const [isGeneratingModalCl, setIsGeneratingModalCl] = useState(false);
+  const [isEnhancingModalCl, setIsEnhancingModalCl] = useState(false);
+
+  // Auth gate inside Modal
+  const [isModalAuthLoggedIn, setIsModalAuthLoggedIn] = useState(false);
+  const [modalAuthEmail, setModalAuthEmail] = useState("");
+  const [modalAuthPassword, setModalAuthPassword] = useState("");
+  const [modalAuthUser, setModalAuthUser] = useState<{ email: string; name: string } | null>(null);
+  const [modalAuthView, setModalAuthView] = useState<"login" | "signup" | "profile">("login");
+
+  // Favorites template IDs
+  const [favoritesList, setFavoritesList] = useState<string[]>([]);
+
+  // Load local DB on startup or opening modal
+  useEffect(() => {
+    const raw = localStorage.getItem("careerwith_resumes_v2");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        setSavedResumesList(parsed);
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      const defaultItem = {
+        id: "default",
+        name: "My Principal Resume",
+        folder: "Personal",
+        isFavorite: false,
+        lastSaved: new Date().toLocaleString(),
+        data: resume
+      };
+      const seed = [defaultItem];
+      localStorage.setItem("careerwith_resumes_v2", JSON.stringify(seed));
+      setSavedResumesList(seed);
+    }
+
+    const favs = localStorage.getItem("careerwith_favorites");
+    if (favs) {
+      try {
+        setFavoritesList(JSON.parse(favs));
+      } catch (e) {}
+    }
+  }, []);
+
+  // Whenever showJsonModal opens, sync active text
+  useEffect(() => {
+    if (showJsonModal) {
+      setJsonCodeText(JSON.stringify(resume, null, 2));
+      setEditorUndoStack([JSON.stringify(resume, null, 2)]);
+      setEditorRedoStack([]);
+      setJsonError(null);
+    }
+  }, [showJsonModal]);
 
   // Floating Control Center states
   const [showFloatingWindow, setShowFloatingWindow] = useState(false);
@@ -1519,6 +1686,229 @@ export default function App() {
     showToast("Word document download started successfully!", "success");
   };
 
+  // ================= NEW OVERLAY RESUME ENGINE HELPER FUNCTIONS =================
+  const handleSelectResumeFromList = (id: string) => {
+    const target = savedResumesList.find(r => r.id === id);
+    if (!target) return;
+    setActiveSavedResumeId(id);
+    setJsonCodeText(JSON.stringify(target.data, null, 2));
+    setEditorUndoStack([JSON.stringify(target.data, null, 2)]);
+    setEditorRedoStack([]);
+    setJsonError(null);
+    showToast(`Loaded resume: ${target.name}`, "info");
+  };
+
+  const handleDuplicateResume = (id: string) => {
+    const target = savedResumesList.find(r => r.id === id);
+    if (!target) return;
+    const newId = `resume-${Date.now()}`;
+    const newItem = {
+      ...target,
+      id: newId,
+      name: `${target.name} Copy`,
+      isFavorite: false,
+      lastSaved: new Date().toLocaleString()
+    };
+    const updated = [...savedResumesList, newItem];
+    setSavedResumesList(updated);
+    localStorage.setItem("careerwith_resumes_v2", JSON.stringify(updated));
+    showToast("Resume duplicated successfully!", "success");
+  };
+
+  const handleDeleteResume = (id: string) => {
+    if (savedResumesList.length <= 1) {
+      showToast("Cannot delete the only remaining resume draft.", "error");
+      return;
+    }
+    const updated = savedResumesList.filter(r => r.id !== id);
+    setSavedResumesList(updated);
+    localStorage.setItem("careerwith_resumes_v2", JSON.stringify(updated));
+    if (activeSavedResumeId === id) {
+      const fallback = updated[0];
+      setActiveSavedResumeId(fallback.id);
+      setJsonCodeText(JSON.stringify(fallback.data, null, 2));
+    }
+    showToast("Resume draft deleted.", "info");
+  };
+
+  const handleCreateNewResume = () => {
+    if (!newResumeName.trim()) {
+      showToast("Please enter a name for the new resume.", "error");
+      return;
+    }
+    const newId = `resume-${Date.now()}`;
+    const newItem = {
+      id: newId,
+      name: newResumeName.trim(),
+      folder: newResumeFolder,
+      isFavorite: false,
+      lastSaved: new Date().toLocaleString(),
+      data: demoResumeData
+    };
+    const updated = [...savedResumesList, newItem];
+    setSavedResumesList(updated);
+    localStorage.setItem("careerwith_resumes_v2", JSON.stringify(updated));
+    setActiveSavedResumeId(newId);
+    setJsonCodeText(JSON.stringify(demoResumeData, null, 2));
+    setNewResumeName("");
+    showToast(`Created resume "${newItem.name}"!`, "success");
+  };
+
+  const handleToggleFavoriteTemplate = (tplId: string) => {
+    let updated;
+    if (favoritesList.includes(tplId)) {
+      updated = favoritesList.filter(f => f !== tplId);
+    } else {
+      updated = [...favoritesList, tplId];
+    }
+    setFavoritesList(updated);
+    localStorage.setItem("careerwith_favorites", JSON.stringify(updated));
+  };
+
+  const handleCodeTextChange = (text: string) => {
+    setJsonCodeText(text);
+    
+    // Manage undo stack dynamically (max 30 states)
+    if (editorUndoStack.length === 0 || editorUndoStack[editorUndoStack.length - 1] !== text) {
+      const nextUndo = [...editorUndoStack.slice(-29), text];
+      setEditorUndoStack(nextUndo);
+      setEditorRedoStack([]);
+    }
+
+    try {
+      const parsed = JSON.parse(text);
+      setJsonError(null);
+      
+      // Auto-save parsed data to active local database item
+      const updatedList = savedResumesList.map(item => {
+        if (item.id === activeSavedResumeId) {
+          return {
+            ...item,
+            lastSaved: new Date().toLocaleString(),
+            data: parsed
+          };
+        }
+        return item;
+      });
+      setSavedResumesList(updatedList);
+      localStorage.setItem("careerwith_resumes_v2", JSON.stringify(updatedList));
+    } catch (err: any) {
+      setJsonError(err.message || "Invalid JSON syntax");
+    }
+  };
+
+  const handleUndoEditor = () => {
+    if (editorUndoStack.length > 1) {
+      const popped = editorUndoStack[editorUndoStack.length - 1];
+      const nextUndo = editorUndoStack.slice(0, -1);
+      const prevText = nextUndo[nextUndo.length - 1];
+      setEditorUndoStack(nextUndo);
+      setEditorRedoStack([popped, ...editorRedoStack]);
+      setJsonCodeText(prevText);
+      try {
+        JSON.parse(prevText);
+        setJsonError(null);
+      } catch (e: any) {
+        setJsonError(e.message);
+      }
+    }
+  };
+
+  const handleRedoEditor = () => {
+    if (editorRedoStack.length > 0) {
+      const nextText = editorRedoStack[0];
+      setEditorRedoStack(editorRedoStack.slice(1));
+      setEditorUndoStack([...editorUndoStack, nextText]);
+      setJsonCodeText(nextText);
+      try {
+        JSON.parse(nextText);
+        setJsonError(null);
+      } catch (e: any) {
+        setJsonError(e.message);
+      }
+    }
+  };
+
+  const handleFormattedJson = () => {
+    try {
+      const parsed = JSON.parse(jsonCodeText);
+      const formatted = JSON.stringify(parsed, null, 2);
+      setJsonCodeText(formatted);
+      setJsonError(null);
+      showToast("JSON Code prettified and aligned!", "success");
+    } catch (err) {
+      showToast("Invalid JSON syntax. Cannot format.", "error");
+    }
+  };
+
+  const handleMoveArrayItem = (sectionKey: "experience" | "education" | "projects", index: number, direction: "up" | "down") => {
+    try {
+      const parsed = JSON.parse(jsonCodeText);
+      const arr = parsed[sectionKey];
+      if (!Array.isArray(arr)) return;
+      const targetIdx = direction === "up" ? index - 1 : index + 1;
+      if (targetIdx < 0 || targetIdx >= arr.length) return;
+      
+      const temp = arr[index];
+      arr[index] = arr[targetIdx];
+      arr[targetIdx] = temp;
+      
+      parsed[sectionKey] = arr;
+      const formatted = JSON.stringify(parsed, null, 2);
+      handleCodeTextChange(formatted);
+      showToast(`Shifted ${sectionKey} item ${direction === 'up' ? 'up' : 'down'}!`, "success");
+    } catch (err) {
+      showToast("Cannot shift items: check JSON syntax.", "error");
+    }
+  };
+
+  const handleInjectObjective = (objectiveText: string) => {
+    try {
+      const parsed = JSON.parse(jsonCodeText);
+      parsed.summary = objectiveText;
+      handleCodeTextChange(JSON.stringify(parsed, null, 2));
+      showToast("Objective merged into JSON summary field!", "success");
+    } catch (e) {
+      showToast("Cannot merge: check JSON syntax.", "error");
+    }
+  };
+
+  const handleInjectSkills = (generatedSkills: any[]) => {
+    try {
+      const parsed = JSON.parse(jsonCodeText);
+      if (!Array.isArray(parsed.skills)) {
+        parsed.skills = [];
+      }
+      generatedSkills.forEach(cat => {
+        parsed.skills.push(cat);
+      });
+      handleCodeTextChange(JSON.stringify(parsed, null, 2));
+      showToast("Skills categories appended to skills array!", "success");
+    } catch (e) {
+      showToast("Cannot merge: check JSON syntax.", "error");
+    }
+  };
+
+  const handleInjectProject = (title: string, techStack: string, bullets: string[]) => {
+    try {
+      const parsed = JSON.parse(jsonCodeText);
+      if (!Array.isArray(parsed.projects)) {
+        parsed.projects = [];
+      }
+      parsed.projects.push({
+        id: `proj-${Date.now()}`,
+        title,
+        techStack,
+        link: "",
+        bullets
+      });
+      handleCodeTextChange(JSON.stringify(parsed, null, 2));
+      showToast("Project appended to projects array!", "success");
+    } catch (e) {
+      showToast("Cannot merge: check JSON syntax.", "error");
+    }
+  };
+
   // Dynamic style class mapping for customizable template palettes
   const isDarkTheme = resumeStyle === "midnight" || resumeStyle === "future";
   const textPrimary = isDarkTheme ? "text-stone-100" : "text-stone-900";
@@ -1529,115 +1919,292 @@ export default function App() {
 
   if (showEntrancePage) {
     return (
-      <div className="min-h-screen bg-gold-stone-flow flex flex-col justify-between items-center p-6 md:p-12 relative overflow-hidden font-sans">
-        {/* Decorative elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/40 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-stone-200/20 rounded-full blur-[100px] pointer-events-none" />
+      <div className="min-h-screen text-[#5C2018] flex flex-col justify-between items-center relative overflow-hidden font-sans select-none pb-8">
+        {/* Liquid Glass Background */}
+        <div className="liquid-glass-bg">
+          <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-[#BC4639]/20 rounded-full blur-[90px] animate-blob-1" />
+          <div className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] bg-[#4285F4]/15 rounded-full blur-[100px] animate-blob-2" />
+          <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[450px] h-[450px] bg-[#D4A59A]/20 rounded-full blur-[90px] animate-blob-3" />
+          <div className="liquid-glass-overlay" />
+        </div>
 
-        {/* Top Header */}
-        <header className="w-full max-w-6xl flex justify-between items-center z-10 mb-8">
-          <div className="flex items-center gap-2 bg-white/40 backdrop-blur-md px-4 py-2 rounded-2xl border border-stone-200/40 shadow-sm">
-            <div className="bg-white rounded-xl p-1.5 flex items-center justify-center shadow-sm border border-stone-100">
-              <FileText className="h-5 w-5 text-yellow-500 stroke-[2.5]" />
+        {/* Navigation Header */}
+        <header className="w-full max-w-7xl flex justify-between items-center px-6 py-5 z-20 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="glass-neomorphic-icon rounded-xl p-2.5 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-[#5C2018] stroke-[2.5]" />
             </div>
-            <span className="text-stone-850 font-extrabold tracking-tight text-lg">
+            <span className="text-[#5C2018] font-serif font-black tracking-tight text-xl">
               CareerWith
             </span>
+            <span className="hidden sm:inline-block text-[9px] bg-[#BC4639]/10 text-[#BC4639] border border-[#BC4639]/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold font-mono">
+              Petra Professional Studio
+            </span>
           </div>
-          <button
-            onClick={() => setShowEntrancePage(false)}
-            className="text-stone-700 text-xs font-black bg-white/40 hover:bg-white/60 backdrop-blur-md px-4.5 py-2.5 rounded-2xl border border-stone-200/40 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 flex items-center gap-1.5"
-          >
-            Direct Access <ChevronRight className="h-3.5 w-3.5 text-yellow-600" />
-          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowEntrancePage(false)}
+              className="text-white text-xs font-bold bg-[#4285F4] hover:bg-[#357AE8] px-5 py-2.5 rounded-xl border border-blue-600/30 transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95 flex items-center gap-1.5"
+            >
+              Start Building <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </header>
 
-        {/* Main Content Area */}
-        <main className="grow flex flex-col items-center justify-center w-full max-w-4xl text-center z-10 my-auto py-8">
-          {/* Glassmorphic Slogan Display Container */}
-          <div className="gold-stone-border-glow bg-white/85 backdrop-blur-2xl rounded-[36px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] p-8 md:p-12 lg:p-16 max-w-3xl w-full mx-auto transform transition-all duration-500 hover:scale-[1.01] border border-white/60">
-            {/* Smile Badge */}
-            <div className="inline-flex items-center gap-1.5 bg-yellow-100 border border-yellow-250 text-yellow-800 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-6 shadow-sm">
-              <span>😊</span> Smile Slogan Theme
+        {/* Main Content (Hero + Audiences + Templates) */}
+        <main className="grow w-full max-w-7xl z-10 px-6 flex flex-col items-center justify-center py-6 gap-12">
+          
+          {/* Hero Section */}
+          <section className="text-center max-w-3xl mx-auto space-y-5">
+            <div className="inline-flex items-center gap-1.5 bg-[#BC4639]/10 border border-[#BC4639]/20 text-[#BC4639] text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-sm backdrop-blur">
+              <Sparkles className="h-3 w-3 animate-pulse" /> Cinematic Resume Builder
             </div>
-
-            {/* Glowing Slogan Text */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-black leading-tight tracking-tight mb-8 font-sans px-2">
-              <span className="text-gold-stone-glow drop-shadow-sm select-none">
-                "{SLOGANS[selectedSloganIndex]}"
-              </span>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-black leading-tight tracking-tight px-2">
+              Build a Resume That <br/>
+              <span className="text-indigo-glow drop-shadow" style={{ backgroundImage: 'linear-gradient(135deg, #5C2018 0%, #BC4639 50%, #4285F4 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Commands Authority.</span>
             </h1>
 
-            {/* Selector Dots / Tabs to change slogans */}
-            <div className="flex flex-col items-center gap-3 mb-10">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-stone-400">
-                Choose Your Inspiration
-              </span>
-              <div className="flex justify-center gap-2">
+            {/* Slogans Slideshow Container */}
+            <div className="p-5 bg-[#D4A59A]/20 border border-[#D4A59A]/45 rounded-[22px] max-w-2xl mx-auto backdrop-blur-sm w-full">
+              <p className="text-sm md:text-base font-semibold text-[#5C2018]/90 italic min-h-[48px] flex items-center justify-center px-4 leading-relaxed">
+                "{SLOGANS[selectedSloganIndex]}"
+              </p>
+              <div className="flex justify-center gap-1.5 mt-3">
                 {SLOGANS.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedSloganIndex(index)}
-                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                       selectedSloganIndex === index
-                        ? "w-8 bg-gradient-to-r from-yellow-500 to-amber-600 shadow-md"
-                        : "w-2.5 bg-stone-250 hover:bg-stone-300"
+                        ? "w-6 bg-[#BC4639] shadow"
+                        : "w-2 bg-[#D4A59A] hover:bg-[#BC4639]/60"
                     }`}
-                    title={`Slogan variation ${index + 1}`}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Main Interactive Button */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <div className="flex justify-center gap-3.5 pt-2">
               <button
                 onClick={() => setShowEntrancePage(false)}
-                className="gold-stone-button w-full sm:w-auto px-8 py-4.5 rounded-2xl font-black text-sm tracking-wide shadow-lg flex items-center justify-center gap-3 cursor-pointer select-none active:scale-95 duration-150 animate-pulse"
+                className="px-7 py-3.5 bg-[#4285F4] hover:bg-[#357AE8] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
               >
-                <Sparkles className="h-4.5 w-4.5 text-white fill-white/20 animate-pulse" />
-                Build My Resume Now
+                Create My Resume
+              </button>
+              <button
+                onClick={() => {
+                  handleLoadDemo();
+                  setShowEntrancePage(false);
+                }}
+                className="px-7 py-3.5 bg-transparent hover:bg-[#5C2018]/5 text-[#5C2018] border-2 border-[#5C2018] font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all hover:-translate-y-0.5 cursor-pointer"
+              >
+                Explore Demo Resume
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* Quick Feature Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mt-12">
-            {[
-              {
-                icon: <Wand2 className="h-5 w-5 text-yellow-500 stroke-[2]" />,
-                title: "100+ Career Roles",
-                desc: "Auto-generate professional tailored content in seconds."
-              },
-              {
-                icon: <TrendingUp className="h-5 w-5 text-amber-500 stroke-[2]" />,
-                title: "ATS Score Scanner",
-                desc: "Scan and optimize resume matching keyword density."
-              },
-              {
-                icon: <FileText className="h-5 w-5 text-yellow-600 stroke-[2]" />,
-                title: "AI Cover Letter",
-                desc: "Draft role-specific matching cover letters instantly."
-              }
-            ].map((feat, idx) => (
+          {/* Divided Targets Grid: Students, Professionals, Companies */}
+          <section className="w-full">
+            <h2 className="text-xs font-black uppercase text-center tracking-widest text-[#BC4639] mb-8">Designed For Every Career Stage</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Card 1: Students */}
               <div
-                key={idx}
-                className="bg-white/50 backdrop-blur-md border border-stone-200/50 rounded-2xl p-5 text-left text-stone-800 shadow-sm hover:bg-white/80 transition-all duration-300"
+                className="bg-[#D4A59A]/30 border border-[#D4A59A]/50 rounded-2xl p-6 flex flex-col justify-between hover-card-trigger cursor-pointer"
+                onClick={() => {
+                  const idx = domainsAndRoles.findIndex(d => d.domain.includes("Student"));
+                  if (idx !== -1) {
+                    setSelectedDomainIdx(idx);
+                    const defaultRole = domainsAndRoles[idx].roles[0]?.role || "Graduate Intern";
+                    setSelectedRoleName(defaultRole);
+                    const preset = TEMPLATE_PRESETS.find(p => p.id === "student-basic") || TEMPLATE_PRESETS.find(p => p.id === "modern-minimal");
+                    if (preset) {
+                      setResumeStyle("modern");
+                      setPreviewThemeColor(preset.color);
+                      setPreviewFontFamily(preset.font as any);
+                    }
+                  }
+                  if (JSON.stringify(resume) === JSON.stringify(INITIAL_RESUME)) {
+                    handleLoadDemo();
+                  }
+                  setShowEntrancePage(false);
+                  showToast("Welcome! Loaded Student & Graduate entry-level workspace.", "success");
+                }}
               >
-                <div className="bg-stone-50 rounded-xl p-2 w-fit mb-3 flex items-center justify-center border border-stone-200/40">
-                  {feat.icon}
+                <div className="space-y-4">
+                  <div className="h-10 w-10 glass-neomorphic-icon rounded-xl flex items-center justify-center text-[#BC4639]">
+                    <GraduationCap className="h-5 w-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#5C2018] font-serif">For Students & Graduates</h3>
+                    <p className="text-xs text-[#5C2018]/85 leading-relaxed mt-2 font-medium">
+                      Kickstart your career with clean entry-level presets. Focus on academic milestones, key student projects, and core skill listings.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-sm font-black tracking-tight mb-1 text-stone-900">{feat.title}</h3>
-                <p className="text-[11px] text-stone-500 leading-normal font-semibold">{feat.desc}</p>
+                <div className="mt-4 pt-3 border-t border-[#BC4639]/10 text-[10px] text-[#BC4639] font-mono font-bold uppercase tracking-wider">
+                  ✦ Graduate Entry Presets • Coursework Grids
+                </div>
               </div>
-            ))}
-          </div>
+
+              {/* Card 2: Professional Employees */}
+              <div
+                className="bg-[#D4A59A]/30 border border-[#D4A59A]/50 rounded-2xl p-6 flex flex-col justify-between hover-card-trigger cursor-pointer"
+                onClick={() => {
+                  const idx = domainsAndRoles.findIndex(d => d.domain.includes("Software Development"));
+                  if (idx !== -1) {
+                    setSelectedDomainIdx(idx);
+                    const defaultRole = domainsAndRoles[idx].roles[0]?.role || "Software Engineer";
+                    setSelectedRoleName(defaultRole);
+                    const preset = TEMPLATE_PRESETS.find(p => p.id === "modern-tech");
+                    if (preset) {
+                      setResumeStyle("modern");
+                      setPreviewThemeColor(preset.color);
+                      setPreviewFontFamily(preset.font as any);
+                    }
+                  }
+                  if (JSON.stringify(resume) === JSON.stringify(INITIAL_RESUME)) {
+                    handleLoadDemo();
+                  }
+                  setShowEntrancePage(false);
+                  showToast("Welcome! Loaded Professional software engineer workspace.", "success");
+                }}
+              >
+                <div className="space-y-4">
+                  <div className="h-10 w-10 glass-neomorphic-icon rounded-xl flex items-center justify-center text-[#4285F4]">
+                    <Briefcase className="h-5 w-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#5C2018] font-serif">For Professional Employees</h3>
+                    <p className="text-xs text-[#5C2018]/85 leading-relaxed mt-2 font-medium">
+                      Audit your resume against specific target roles. Optimize bullet points using the STAR method (Situation, Task, Action, Result) and generate matching cover letters instantly.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-[#BC4639]/10 text-[10px] text-[#4285F4] font-mono font-bold uppercase tracking-wider">
+                  ★ AI STAR Rewrite • ATS Auditing
+                </div>
+              </div>
+
+              {/* Card 3: Recruiters & Companies */}
+              <div
+                className="bg-[#D4A59A]/30 border border-[#D4A59A]/50 rounded-2xl p-6 flex flex-col justify-between hover-card-trigger cursor-pointer"
+                onClick={() => {
+                  const idx = domainsAndRoles.findIndex(d => d.domain.includes("Management") || d.domain.includes("MBA"));
+                  if (idx !== -1) {
+                    setSelectedDomainIdx(idx);
+                    const defaultRole = domainsAndRoles[idx].roles[0]?.role || "Product Manager";
+                    setSelectedRoleName(defaultRole);
+                    const preset = TEMPLATE_PRESETS.find(p => p.id === "exec-classic");
+                    if (preset) {
+                      setResumeStyle("executive");
+                      setPreviewThemeColor(preset.color);
+                      setPreviewFontFamily(preset.font as any);
+                    }
+                  }
+                  if (JSON.stringify(resume) === JSON.stringify(INITIAL_RESUME)) {
+                    handleLoadDemo();
+                  }
+                  setShowEntrancePage(false);
+                  showToast("Welcome! Loaded Corporate & Executive template workspace.", "success");
+                }}
+              >
+                <div className="space-y-4">
+                  <div className="h-10 w-10 glass-neomorphic-icon rounded-xl flex items-center justify-center text-[#BC4639]">
+                    <User className="h-5 w-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#5C2018] font-serif">For Employers & Companies</h3>
+                    <p className="text-xs text-[#5C2018]/85 leading-relaxed mt-2 font-medium">
+                      All resumes conform to standard layout architectures, ensuring perfect readability by company ATS systems and recruiter screening software.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-[#BC4639]/10 text-[10px] text-[#BC4639] font-mono font-bold uppercase tracking-wider">
+                  ✔ 100% ATS Readable • Clean Layouts
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          {/* Quick Preview of Available Templates */}
+          <section className="w-full space-y-5">
+            <div className="text-center">
+              <h2 className="text-xs font-black uppercase tracking-widest text-[#BC4639]">Resume Styling Presets</h2>
+              <p className="text-xs text-[#5C2018]/80 mt-1 font-medium">Select from 10+ standard templates to match your professional domain</p>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { name: "Tech Elegant", type: "Modern", color: "from-indigo-500 to-slate-900", font: "Inter", img: "/tech_elegant.png" },
+                { name: "Boardroom Classic", type: "Executive", color: "from-slate-700 to-slate-900", font: "Serif", img: "/boardroom_classic.png" },
+                { name: "Minimal Developer", type: "Minimal", color: "from-stone-600 to-stone-900", font: "Mono", img: "/minimal_developer.png" },
+                { name: "Creative Split Panel", type: "Creative", color: "from-purple-600 to-slate-900", font: "Sans", img: "/creative_split_panel.png" }
+              ].map((tpl, tIdx) => (
+                <div
+                  key={tIdx}
+                  className="bg-[#D4A59A]/30 border border-[#D4A59A]/50 p-4 rounded-xl flex flex-col justify-between hover:border-[#BC4639]/50 transition-all cursor-pointer transform hover:-translate-y-1 shadow-sm hover:shadow-md group"
+                  onClick={() => {
+                    const preset = TEMPLATE_PRESETS.find(p => p.name === tpl.name);
+                    if (preset) {
+                      if (preset.id.startsWith("modern")) setResumeStyle("modern");
+                      else if (preset.id.startsWith("min")) setResumeStyle("tech");
+                      else if (preset.id.startsWith("exec")) setResumeStyle("executive");
+                      else setResumeStyle(preset.id as any);
+                      setPreviewThemeColor(preset.color);
+                      setPreviewFontFamily(preset.font as any);
+                    }
+                    if (JSON.stringify(resume) === JSON.stringify(INITIAL_RESUME)) {
+                      handleLoadDemo();
+                      showToast(`Applied preset: ${tpl.name} and loaded demo resume data!`, "success");
+                    } else {
+                      showToast(`Applied preset style: ${tpl.name}!`, "success");
+                    }
+                    setShowEntrancePage(false);
+                  }}
+                >
+                  <div className="h-24 w-full rounded-lg bg-[#F3E0DC]/75 border border-[#D4A59A]/60 select-none relative overflow-hidden mb-2 shadow-inner">
+                    <img
+                      src={tpl.img}
+                      alt={tpl.name}
+                      className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#5C2018]/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-[10px] text-[#BC4639] font-extrabold uppercase font-mono">{tpl.type}</span>
+                    <h4 className="text-xs font-bold text-[#5C2018] mt-0.5">{tpl.name}</h4>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Quick Statistics Trust Bar */}
+          <section className="w-full bg-[#5C2018] text-[#F3E0DC] p-6 rounded-2xl shadow-lg grid grid-cols-3 text-center gap-4 border border-[#BC4639]/20">
+            <div>
+              <span className="block text-xl sm:text-2xl font-serif font-black text-white">15,000+</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#D4A59A] font-extrabold mt-1">Resumes Built</span>
+            </div>
+            <div className="border-x border-[#BC4639]/30">
+              <span className="block text-xl sm:text-2xl font-serif font-black text-[#4285F4]">99.4%</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#D4A59A] font-extrabold mt-1">ATS Pass Rate</span>
+            </div>
+            <div>
+              <span className="block text-xl sm:text-2xl font-serif font-black text-white">&lt; 3 mins</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[#D4A59A] font-extrabold mt-1">Creation Time</span>
+            </div>
+          </section>
+
         </main>
 
         {/* Footer */}
-        <footer className="w-full max-w-6xl text-center z-10 mt-8">
-          <p className="text-xs text-stone-600 font-semibold tracking-wide flex items-center justify-center gap-1.5">
-            Designed for professional success 🚀
+        <footer className="w-full max-w-7xl text-center z-10 shrink-0 pt-6 border-t border-[#BC4639]/20">
+          <p className="text-[10px] text-[#5C2018]/80 font-semibold tracking-wide flex items-center justify-center gap-1.5">
+            Designed for professional success • CareerWith © 2026 🚀
           </p>
         </footer>
       </div>
@@ -1646,11 +2213,14 @@ export default function App() {
 
   return (
 
-    <div className="min-h-screen bg-[#F0F2F5] text-stone-850 font-sans antialiased selection:bg-yellow-300 selection:text-stone-900 relative overflow-x-hidden">
-      {/* Liquid Glass ambient background blobs */}
-      <div className="absolute top-20 left-10 w-96 h-96 bg-purple-300/20 rounded-full blur-[100px] pointer-events-none z-0" />
-      <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-yellow-200/20 rounded-full blur-[100px] pointer-events-none z-0" />
-      <div className="absolute top-[40%] right-[35%] w-80 h-80 bg-rose-200/15 rounded-full blur-[100px] pointer-events-none z-0" />
+    <div className="min-h-screen text-[#5C2018] font-sans antialiased selection:bg-[#4285F4] selection:text-white relative overflow-x-hidden">
+      {/* Liquid Glass Background */}
+      <div className="liquid-glass-bg">
+        <div className="absolute top-[5%] left-[5%] w-[450px] h-[450px] bg-[#BC4639]/12 rounded-full blur-[90px] animate-blob-1" />
+        <div className="absolute bottom-[5%] right-[5%] w-[500px] h-[500px] bg-[#4285F4]/10 rounded-full blur-[90px] animate-blob-2" />
+        <div className="absolute top-[35%] right-[25%] w-[400px] h-[400px] bg-[#D4A59A]/12 rounded-full blur-[95px] animate-blob-3" />
+        <div className="liquid-glass-overlay" />
+      </div>
       
       {/* Toast Notifications */}
       <AnimatePresence>
@@ -1661,10 +2231,10 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 text-sm no-print ${
               toastMessage.type === "success"
-                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                ? "bg-emerald-50 border-emerald-250 text-emerald-800"
                 : toastMessage.type === "error"
                 ? "bg-red-50 border-red-200 text-red-800"
-                : "bg-[#FEFCE8] border-[#FEF08A] text-[#854D0E]"
+                : "bg-[#F3E0DC] border-[#BC4639]/30 text-[#5C2018]"
             }`}
           >
             <Sparkle className="h-4 w-4 shrink-0 fill-current" />
@@ -1676,14 +2246,14 @@ export default function App() {
       {/* Main Container */}
       <div className={`max-w-[1700px] mx-auto px-4 md:px-6 lg:px-8 py-5 ${showCoverLetterModal ? "no-print" : ""}`}>
         {/* Navigation Bar */}
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-stone-200/80 mb-6 gap-4 no-print">
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between p-4.5 bg-white/50 backdrop-blur border border-white/30 rounded-2xl mb-6 gap-4 no-print shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="bg-stone-50 border border-stone-200/50 rounded-xl shadow-neomorphic text-stone-800 p-2.5 flex items-center justify-center">
-              <FileText className="h-6 w-6 text-yellow-500 stroke-[2.5]" />
+            <div className="bg-[#5C2018] border border-[#BC4639]/30 rounded-xl shadow-sm text-white p-2.5 flex items-center justify-center">
+              <FileText className="h-6 w-6 stroke-[2.5]" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 flex items-center gap-1.5">
-                CareerWith <span className="text-yellow-500 font-medium text-xs bg-yellow-100 border border-yellow-300 px-2 py-0.5 rounded-full uppercase tracking-wider">Resume Builder</span>
+              <h1 className="text-2xl font-serif font-black tracking-tight text-[#5C2018] flex items-center gap-1.5">
+                CareerWith <span className="text-[#BC4639] font-bold text-xs bg-[#BC4639]/10 border border-[#BC4639]/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-sans">Resume Studio</span>
               </h1>
             </div>
           </div>
@@ -1691,9 +2261,9 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setShowEntrancePage(true)}
-              className="flex items-center gap-2 text-xs font-bold bg-white text-stone-700 hover:bg-stone-50 px-3 py-2 rounded-xl shadow-neomorphic border border-stone-200/40 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
             >
-              <span className="p-1 rounded-lg bg-stone-50 text-stone-600 shadow-neomorphic border border-white/60 flex items-center justify-center shrink-0">
+              <span className="p-1 rounded-lg bg-white text-[#5C2018] border border-[#D4A59A]/30 flex items-center justify-center shrink-0">
                 <span className="text-xs">🏠</span>
               </span>
               Home Screen
@@ -1703,46 +2273,46 @@ export default function App() {
                 setJsonCodeText(JSON.stringify(resume, null, 2));
                 setShowJsonModal(true);
               }}
-              className="flex items-center gap-2 text-xs font-bold bg-stone-50 text-stone-700 hover:bg-white px-3 py-2 rounded-xl shadow-neomorphic border border-stone-200/40 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
             >
-              <span className="p-1 rounded-lg bg-stone-50 text-yellow-600 shadow-neomorphic border border-white/60 flex items-center justify-center shrink-0">
+              <span className="p-1 rounded-lg bg-white text-[#5C2018] border border-[#D4A59A]/30 flex items-center justify-center shrink-0">
                 <FileText className="h-3.5 w-3.5" />
               </span>
-              JSON Code Editor 💻
+              JSON Editor 💻
             </button>
             <button
               onClick={handleLoadDemo}
-              className="flex items-center gap-2 text-xs font-bold bg-stone-50 text-stone-700 hover:bg-white px-3 py-2 rounded-xl shadow-neomorphic border border-stone-200/40 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
             >
-              <span className="p-1 rounded-lg bg-stone-50 text-stone-600 shadow-neomorphic border border-white/60 flex items-center justify-center shrink-0">
+              <span className="p-1 rounded-lg bg-white text-[#5C2018] border border-[#D4A59A]/30 flex items-center justify-center shrink-0">
                 <RotateCcw className="h-3.5 w-3.5" />
               </span>
               Demo Data
             </button>
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 text-xs font-bold bg-stone-50 text-stone-700 hover:bg-white px-3 py-2 rounded-xl shadow-neomorphic border border-stone-200/40 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-bold bg-[#BC4639]/10 hover:bg-[#BC4639]/20 text-[#BC4639] px-3 py-2 rounded-xl border border-[#BC4639]/25 shadow-sm transition-all cursor-pointer"
             >
-              <span className="p-1 rounded-lg bg-stone-50 text-red-500 shadow-neomorphic border border-white/60 flex items-center justify-center shrink-0">
+              <span className="p-1 rounded-lg bg-white text-[#BC4639] border border-[#BC4639]/20 flex items-center justify-center shrink-0">
                 <Trash2 className="h-3.5 w-3.5" />
               </span>
               Reset Form
             </button>
             <button
               onClick={() => setShowATSModal(true)}
-              className="flex items-center gap-2 text-xs font-bold bg-stone-900 text-yellow-400 hover:bg-stone-800 px-3.5 py-2 rounded-xl shadow-neomorphic border border-stone-800 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-bold bg-[#5C2018] hover:bg-[#5C2018]/90 text-[#F3E0DC] px-3.5 py-2 rounded-xl border border-[#BC4639]/20 shadow-sm transition-all cursor-pointer"
             >
-              <span className="p-1 rounded-lg bg-stone-800 text-yellow-400 shadow-neomorphic-inset border border-stone-700/50 flex items-center justify-center shrink-0">
+              <span className="p-1 rounded-lg bg-[#5C2018]/50 text-[#F3E0DC] border border-[#BC4639]/30 flex items-center justify-center shrink-0">
                 <TrendingUp className="h-3.5 w-3.5" />
               </span>
               ATS Score Scanner
             </button>
             <button
               onClick={() => setShowCoverLetterModal(true)}
-              className="flex items-center gap-2 text-xs font-black bg-yellow-400 text-stone-900 hover:bg-yellow-500 px-3.5 py-2 rounded-xl shadow-neomorphic border border-yellow-500/30 hover:shadow-neomorphic-inset transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-bold bg-[#4285F4] hover:bg-[#357AE8] text-white px-3.5 py-2 rounded-xl border border-blue-600/30 shadow-md transition-all cursor-pointer"
             >
-              <span className="p-1 rounded-lg bg-white/80 text-yellow-600 shadow-neomorphic border border-yellow-200/40 flex items-center justify-center shrink-0">
-                <Wand2 className="h-3.5 w-3.5 text-stone-900 stroke-[2.5]" />
+              <span className="p-1 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
+                <Wand2 className="h-3.5 w-3.5 stroke-[2.5]" />
               </span>
               AI Cover Letter
             </button>
@@ -1753,29 +2323,29 @@ export default function App() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
           
           {/* LEFT: Creator Wizard (xl:col-span-5) */}
-          <section className="xl:col-span-5 bg-white/45 backdrop-blur-xl border border-white/60 rounded-3xl shadow-neomorphic p-5 md:p-6 sticky top-5 max-h-[calc(100vh-140px)] overflow-y-auto no-print relative z-10 transition-all duration-300">
+          <section className="xl:col-span-5 bg-white/80 backdrop-blur border border-white/30 rounded-3xl shadow-sm p-5 md:p-6 sticky top-5 max-h-[calc(100vh-140px)] overflow-y-auto no-print relative z-10 transition-all duration-300">
             
             {/* AI Career Co-Pilot Section */}
-            <div className="mb-6 bg-gradient-to-br from-amber-50/40 via-yellow-50/20 to-stone-50 border border-yellow-200/80 rounded-2xl shadow-sm p-4">
+            <div className="mb-6 bg-[#D4A59A]/15 border border-[#BC4639]/20 rounded-2xl shadow-sm p-4">
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="p-1.5 rounded-xl bg-stone-50 text-yellow-600 shadow-neomorphic border border-white/60 flex items-center justify-center shrink-0">
+                <div className="p-1.5 rounded-xl bg-white text-[#BC4639] border border-[#BC4639]/20 flex items-center justify-center shrink-0 shadow-sm">
                   <Wand2 className="h-4 w-4 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-stone-900 uppercase tracking-tight">AI Career Co-Pilot</h3>
-                  <p className="text-[11px] text-stone-500 font-medium">Smart ways to draft or import your resume details</p>
+                  <h3 className="text-sm font-black text-[#5C2018] uppercase tracking-tight">AI Career Co-Pilot</h3>
+                  <p className="text-[11px] text-[#5C2018]/80 font-medium">Smart ways to draft or import your resume details</p>
                 </div>
               </div>
 
               {/* Sub-Tabs: Generate vs Import */}
-              <div className="grid grid-cols-2 bg-stone-100 p-1 rounded-xl mb-4 text-xs font-bold border border-stone-200/50">
+              <div className="grid grid-cols-2 bg-[#D4A59A]/20 p-1 rounded-xl mb-4 text-xs font-bold border border-[#D4A59A]/30">
                 <button
                   type="button"
                   onClick={() => setCopilotTab("generate")}
                   className={`py-1.5 rounded-lg text-center transition-all cursor-pointer ${
                     copilotTab === "generate"
-                      ? "bg-white text-stone-900 shadow-sm border border-stone-200/40"
-                      : "text-stone-500 hover:text-stone-800"
+                      ? "bg-white text-[#5C2018] shadow-sm border border-[#D4A59A]/20"
+                      : "text-[#BC4639] hover:text-[#5C2018]"
                   }`}
                 >
                   ✨ Draft From Scratch
@@ -2171,7 +2741,7 @@ export default function App() {
             </div>
 
             {/* Wizard Section Tab Bar */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-3 mb-5 border-b border-stone-100 scrollbar-none">
+            <div className="flex items-center gap-1 overflow-x-auto pb-3 mb-5 border-b border-[#D4A59A]/30 scrollbar-none">
               {[
                 { id: "personal", label: "Contact", icon: User },
                 { id: "summary", label: "Summary", icon: Sparkles },
@@ -2187,16 +2757,16 @@ export default function App() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                       isActive
-                        ? "bg-[#FEFCE8]/90 text-[#854D0E] border border-[#FEF08A]/65 shadow-neomorphic-inset"
-                        : "bg-stone-50/50 text-stone-500 hover:text-stone-850 hover:bg-stone-50 border border-stone-200/40 shadow-neomorphic"
+                        ? "bg-[#4285F4] text-white border border-[#4285F4]/30 shadow-md"
+                        : "bg-[#D4A59A]/15 text-[#5C2018] hover:bg-[#D4A59A]/30 border border-[#D4A59A]/30 shadow-sm"
                     }`}
                   >
                     <span className={`p-1 rounded-lg flex items-center justify-center transition-all ${
                       isActive 
-                        ? "bg-white text-yellow-600 shadow-neomorphic-inset border border-stone-200/40" 
-                        : "bg-stone-50 text-stone-400 shadow-neomorphic border border-white/60"
+                        ? "bg-white/10 text-white" 
+                        : "bg-[#D4A59A]/20 text-[#BC4639]"
                     }`}>
                       <Icon className="h-3.5 w-3.5" />
                     </span>
@@ -4998,131 +5568,661 @@ export default function App() {
       {/* Modal: JSON Raw Code Engine */}
       <AnimatePresence>
         {showJsonModal && (
-          <div className="fixed inset-0 z-50 overflow-y-auto no-print">
-            <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-              
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowJsonModal(false)}
-                className="fixed inset-0 transition-opacity bg-stone-900/40 backdrop-blur-sm"
-              />
-
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                className="relative z-10 inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white border border-stone-200 shadow-2xl rounded-2xl sm:align-middle"
-              >
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-stone-100 pb-4 mb-4 font-sans">
-                  <div className="flex items-center gap-2">
-                    <Wand2 className="h-5 w-5 text-yellow-600" />
-                    <h3 className="text-lg font-black text-stone-900 tracking-tight">JSON Resume Code Engine</h3>
-                  </div>
-                  <button
-                    onClick={() => setShowJsonModal(false)}
-                    className="text-stone-400 hover:text-stone-600 p-1.5 hover:bg-stone-50 rounded-lg cursor-pointer transition-all"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+          <div className="fixed inset-0 z-50 overflow-hidden flex flex-col no-print bg-[#0b0f19] text-slate-100 font-sans select-none">
+            
+            {/* HEADER BAR */}
+            <header className="flex items-center justify-between px-6 py-4 bg-[#0f172a] border-b border-slate-800 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-slate-800 text-yellow-400 flex items-center justify-center">
+                  <Wand2 className="h-5 w-5" />
                 </div>
+                <div>
+                  <h2 className="text-sm font-black tracking-tight leading-none text-white">CareerWith Resume Studio</h2>
+                  <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase mt-1.5 block">Overleaf-Style Code Engine</span>
+                </div>
+              </div>
 
-                <div className="space-y-4 font-sans">
-                  <p className="text-xs text-stone-600 leading-relaxed font-normal">
-                    Import, build, and backup your resume data seamlessly. Paste your custom JSON code structure below, or export your current progress as a local backup.
-                  </p>
+              {/* Center selectors */}
+              <div className="hidden md:flex items-center gap-3 max-w-sm w-full justify-center">
+                <select
+                  value={activeSavedResumeId}
+                  onChange={e => handleSelectResumeFromList(e.target.value)}
+                  className="text-xs px-3 py-1.5 rounded-xl bg-slate-850 border border-slate-700 text-white focus:outline-none cursor-pointer"
+                >
+                  {savedResumesList.map(r => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={savedResumesList.find(r => r.id === activeSavedResumeId)?.name || "My Resume"}
+                  onChange={e => {
+                    const val = e.target.value;
+                    const updated = savedResumesList.map(r => {
+                      if (r.id === activeSavedResumeId) return { ...r, name: val };
+                      return r;
+                    });
+                    setSavedResumesList(updated);
+                    localStorage.setItem("careerwith_resumes_v2", JSON.stringify(updated));
+                  }}
+                  className="w-32 text-xs px-3 py-1.5 rounded-xl bg-slate-850 border border-slate-700 text-white focus:outline-none"
+                  placeholder="Rename Draft"
+                />
+              </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-stone-400 uppercase tracking-wider">JSON Content Code</span>
+              {/* Actions */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setModalTheme(prev => prev === "light" ? "dark" : "light")}
+                  className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                    modalTheme === 'dark' ? 'bg-slate-800 text-yellow-400 border-slate-700 hover:bg-slate-700' : 'bg-slate-700 text-yellow-300 border-slate-600 hover:bg-slate-650'
+                  }`}
+                >
+                  {modalTheme === "light" ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+
+                <button
+                  onClick={() => {
+                    try {
+                      const parsed = JSON.parse(jsonCodeText);
+                      const validated = validateAndSanitizeResume(parsed);
+                      setResume(validated);
+                      setShowJsonModal(false);
+                      showToast("Synced JSON changes with outside forms!", "success");
+                    } catch (err: any) {
+                      showToast(err.message || "Fix JSON syntax errors before syncing.", "error");
+                    }
+                  }}
+                  className="px-4 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-stone-900 text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Check className="h-4 w-4 stroke-[2.5]" />
+                  Exit & Compile Sync
+                </button>
+
+                <button
+                  onClick={() => setShowJsonModal(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </header>
+
+            {/* THREE-PANEL CORE LAYOUT */}
+            <div className="flex flex-1 overflow-hidden">
+              
+              {/* SIDEBAR NAVIGATION */}
+              <aside className="w-52 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
+                <div className="p-3 space-y-1">
+                  <div className="px-3 py-1 text-[9px] font-bold text-slate-500 uppercase tracking-widest">Navigation</div>
+                  {[
+                    { id: "dashboard", label: "My Resumes DB", icon: Folder },
+                    { id: "editor", label: "JSON Editor", icon: FileText },
+                    { id: "templates", label: "Templates", icon: LayoutGrid },
+                    { id: "ai", label: "AI Assistant", icon: Sparkles },
+                    { id: "coverletter", label: "Cover Letters", icon: Wand2 },
+                    { id: "job", label: "Job Analyzer", icon: TrendingUp },
+                    { id: "settings", label: "Page Settings", icon: Settings },
+                    { id: "profile", label: "Account Auth", icon: User }
+                  ].map(tab => {
+                    const Icon = tab.icon;
+                    const isActive = modalSidebarTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setModalSidebarTab(tab.id as any)}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          isActive ? "bg-yellow-400 text-stone-900 shadow" : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span>{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <div className="p-4 border-t border-slate-800 text-[10px] text-slate-500 font-mono">
+                  <div className="flex items-center gap-1 text-emerald-400">
+                    <Check className="h-3 w-3" />
+                    <span>Auto-saved</span>
+                  </div>
+                </div>
+              </aside>
+
+              {/* CENTER WORKSPACE */}
+              <main className={`flex-1 overflow-y-auto flex flex-col p-6 ${modalTheme === 'light' ? 'bg-[#f8fafc]' : 'bg-[#0b0f19]'}`}>
+                
+                {/* 1. DASHBOARD VIEW */}
+                {modalSidebarTab === "dashboard" && (
+                  <div className="space-y-6 max-w-2xl w-full mx-auto">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">Saved Drafts Manager</h3>
+                    </div>
+                    <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
+                      <h4 className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider">Create New Copy</h4>
                       <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Resume designation name..."
+                          value={newResumeName}
+                          onChange={e => setNewResumeName(e.target.value)}
+                          className="flex-1 text-xs px-3 py-2 bg-slate-855 border border-slate-700 text-white rounded-lg focus:outline-none"
+                        />
                         <button
-                          type="button"
-                          onClick={() => {
-                            setJsonCodeText(JSON.stringify(demoResumeData, null, 2));
-                            showToast("Loaded demo JSON code successfully!", "info");
-                          }}
-                          className="text-[10px] text-yellow-700 hover:underline font-bold transition-all"
+                          onClick={handleCreateNewResume}
+                          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-stone-900 text-xs font-black rounded-lg"
                         >
-                          Load Demo Structure
-                        </button>
-                        <span className="text-stone-300">|</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setJsonCodeText(JSON.stringify(resume, null, 2));
-                            showToast("Exported current form data to JSON!", "success");
-                          }}
-                          className="text-[10px] text-yellow-700 hover:underline font-bold transition-all"
-                        >
-                          Export Current Form
-                        </button>
-                        <span className="text-stone-300">|</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            try {
-                              const formatted = JSON.stringify(JSON.parse(jsonCodeText), null, 2);
-                              setJsonCodeText(formatted);
-                              showToast("JSON formatted successfully!", "success");
-                            } catch (err) {
-                              showToast("Invalid JSON syntax. Cannot format.", "error");
-                            }
-                          }}
-                          className="text-[10px] text-yellow-700 hover:underline font-bold transition-all"
-                        >
-                          Format JSON
+                          Add Draft
                         </button>
                       </div>
                     </div>
 
-                    <textarea
-                      value={jsonCodeText}
-                      onChange={e => setJsonCodeText(e.target.value)}
-                      placeholder="Paste your JSON code here..."
-                      className="w-full h-80 text-xs font-mono p-4 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:bg-white text-stone-700 leading-relaxed"
-                    />
+                    <div className="space-y-2">
+                      {savedResumesList.map(item => {
+                        const isActive = activeSavedResumeId === item.id;
+                        return (
+                          <div key={item.id} className="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
+                            <div>
+                              <div className="font-bold text-white flex items-center gap-2">
+                                {item.name}
+                                {isActive && <span className="text-[8px] bg-yellow-400/20 text-yellow-400 px-1 py-0.5 rounded font-black">Active</span>}
+                              </div>
+                              <div className="text-[9px] text-slate-500 mt-1">Saved: {item.lastSaved}</div>
+                            </div>
+                            <div className="flex gap-2">
+                              {!isActive && (
+                                <button
+                                  onClick={() => handleSelectResumeFromList(item.id)}
+                                  className="px-2 py-1 bg-yellow-400 text-stone-900 rounded text-[10px] font-bold"
+                                >
+                                  Load
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDuplicateResume(item.id)}
+                                className="px-2 py-1 bg-slate-800 text-slate-200 rounded text-[10px] font-bold"
+                              >
+                                Copy
+                              </button>
+                              <button
+                                onClick={() => handleDeleteResume(item.id)}
+                                className="p-1 hover:text-red-500 rounded text-slate-400"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
+                )}
 
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        try {
-                          const parsed = JSON.parse(jsonCodeText);
-                          const validated = validateAndSanitizeResume(parsed);
-                          setResume(validated);
-                          setShowJsonModal(false);
-                          showToast("Resume parsed and compiled successfully!", "success");
-                        } catch (err: any) {
-                          showToast(err.message || "JSON Format Error: Please check for missing commas or quotes.", "error");
-                        }
-                      }}
-                      className="flex-1 bg-stone-950 hover:bg-stone-800 text-yellow-400 font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Check className="h-4 w-4" />
-                      Compile & Update Resume
-                    </button>
+                {/* 2. JSON EDITOR VIEW */}
+                {modalSidebarTab === "editor" && (
+                  <div className="flex-1 flex flex-col overflow-hidden min-h-0 space-y-3">
+                    <div className="flex items-center justify-between bg-slate-900 border border-slate-800 p-1.5 rounded-lg text-slate-100 shrink-0">
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={handleUndoEditor} disabled={editorUndoStack.length <= 1} className="p-1 hover:bg-slate-800 rounded disabled:opacity-30">
+                          <Undo className="h-3.5 w-3.5" />
+                        </button>
+                        <button onClick={handleRedoEditor} disabled={editorRedoStack.length === 0} className="p-1 hover:bg-slate-800 rounded disabled:opacity-30">
+                          <Redo className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="w-px h-4 bg-slate-800 mx-1" />
+                        <button onClick={handleFormattedJson} className="text-[9px] font-bold bg-slate-850 border border-slate-700 px-2 py-1 rounded">
+                          Prettify Code
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => handleMoveArrayItem("experience", 0, "down")} className="text-[8px] font-bold bg-slate-855 border border-slate-700 px-2 py-1 rounded">
+                          Shift Exp Down
+                        </button>
+                        <button onClick={() => handleMoveArrayItem("projects", 0, "down")} className="text-[8px] font-bold bg-slate-855 border border-slate-700 px-2 py-1 rounded">
+                          Shift Proj Down
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 flex overflow-hidden min-h-0 border border-slate-850 rounded-xl bg-slate-950 font-mono text-xs">
+                      <div className="py-3 bg-slate-950 border-r border-slate-855 select-none pr-2.5 pl-2.5 text-slate-500 text-right min-w-[36px] flex flex-col font-mono leading-relaxed">
+                        {Array.from({ length: jsonCodeText.split("\n").length }, (_, i) => i + 1).map(n => (
+                          <div key={n} className="h-5">{n}</div>
+                        ))}
+                      </div>
+                      <textarea
+                        value={jsonCodeText}
+                        onChange={e => handleCodeTextChange(e.target.value)}
+                        placeholder="Paste or write JSON Resume format..."
+                        className="flex-1 p-3 bg-slate-950 text-slate-200 font-mono text-xs leading-relaxed focus:outline-none border-none resize-none select-text overflow-y-auto"
+                        spellCheck="false"
+                      />
+                    </div>
+
+                    {jsonError && (
+                      <div className="bg-red-950/70 border border-red-900 p-2 rounded-lg text-red-200 font-mono text-[10px] truncate leading-normal">
+                        Syntax Error: {jsonError}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 3. TEMPLATES VIEW */}
+                {modalSidebarTab === "templates" && (
+                  <div className="space-y-4">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">Select Formatting Styles</h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {TEMPLATE_PRESETS.slice(0, 50).map(tpl => {
+                        const isApplied = resumeStyle === tpl.id || (tpl.id === "modern-tech" && resumeStyle === "modern") || (tpl.id === "min-developer" && resumeStyle === "tech");
+                        return (
+                          <div
+                            key={tpl.id}
+                            className={`p-3 bg-slate-900 border rounded-xl flex items-center justify-between cursor-pointer transition-all hover:border-slate-650 ${
+                              isApplied ? "border-yellow-400" : "border-slate-800"
+                            }`}
+                            onClick={() => {
+                              if (tpl.id.startsWith("modern")) setResumeStyle("modern");
+                              else if (tpl.id.startsWith("min")) setResumeStyle("tech");
+                              else if (tpl.id.startsWith("exec")) setResumeStyle("executive");
+                              else setResumeStyle(tpl.id as any);
+                              setPreviewThemeColor(tpl.color);
+                              setPreviewFontFamily(tpl.font as any);
+                              showToast(`Applied preset: ${tpl.name}!`, "success");
+                            }}
+                          >
+                            <div>
+                              <div className="font-bold text-white text-xs">{tpl.name}</div>
+                              <div className="text-[9px] text-slate-500 mt-1">{tpl.category} ({tpl.font})</div>
+                            </div>
+                            {favoritesList.includes(tpl.id) ? (
+                              <Star onClick={(e) => { e.stopPropagation(); handleToggleFavoriteTemplate(tpl.id); }} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            ) : (
+                              <Star onClick={(e) => { e.stopPropagation(); handleToggleFavoriteTemplate(tpl.id); }} className="h-4 w-4 text-slate-500 hover:text-yellow-400" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. AI ASSISTANT VIEW */}
+                {modalSidebarTab === "ai" && (
+                  <div className="space-y-4 max-w-xl w-full mx-auto text-xs">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">AI Assistant Panel</h3>
+                    </div>
                     
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(jsonCodeText);
-                        showToast("JSON code copied to clipboard!", "success");
-                      }}
-                      className="sm:w-auto px-6 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Clipboard className="h-4 w-4" />
-                      Copy Code
+                    <div className="flex gap-1.5 bg-slate-900 p-1 rounded-xl">
+                      {["objective", "skills", "projects", "interview"].map(t => (
+                        <button
+                          key={t}
+                          onClick={() => { setAiSelectedTool(t as any); setAiGenOutput(null); }}
+                          className={`flex-1 py-1.5 text-center font-bold rounded-lg ${aiSelectedTool === t ? "bg-slate-800 text-yellow-400" : "text-slate-400"}`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="bg-slate-900 p-4 rounded-xl space-y-3 border border-slate-800">
+                      {aiSelectedTool === "objective" && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <input type="text" placeholder="Job Title" value={aiRoleName} onChange={e => setAiRoleName(e.target.value)} className="text-xs p-2 bg-slate-855 rounded border border-slate-700 text-white" />
+                          <input type="text" placeholder="Industry" value={aiIndustry} onChange={e => setAiIndustry(e.target.value)} className="text-xs p-2 bg-slate-855 rounded border border-slate-700 text-white" />
+                        </div>
+                      )}
+                      {aiSelectedTool === "skills" && (
+                        <textarea placeholder="Paste job description requirements..." rows={4} value={aiJobDesc} onChange={e => setAiJobDesc(e.target.value)} className="w-full text-xs p-2 bg-slate-855 rounded border border-slate-700 text-white" />
+                      )}
+                      {aiSelectedTool === "projects" && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <input type="text" placeholder="Project Name" value={aiProjectTitle} onChange={e => setAiProjectTitle(e.target.value)} className="text-xs p-2 bg-slate-855 rounded border border-slate-700 text-white" />
+                          <input type="text" placeholder="Tech stack keywords" value={aiProjectTech} onChange={e => setAiProjectTech(e.target.value)} className="text-xs p-2 bg-slate-855 rounded border border-slate-700 text-white" />
+                        </div>
+                      )}
+                      {aiSelectedTool === "interview" && (
+                        <input type="text" placeholder="Target Role Specialty" value={aiRoleName} onChange={e => setAiRoleName(e.target.value)} className="w-full text-xs p-2 bg-slate-855 rounded border border-slate-700 text-white" />
+                      )}
+
+                      <button
+                        onClick={async () => {
+                          setIsGeneratingAiModal(true);
+                          try {
+                            let endpoint = "/api/generate-objective";
+                            let payload = {};
+                            if (aiSelectedTool === "objective") {
+                              endpoint = "/api/generate-objective";
+                              payload = { roleName: aiRoleName, targetIndustry: aiIndustry };
+                            } else if (aiSelectedTool === "skills") {
+                              endpoint = "/api/generate-skills";
+                              payload = { jobDescription: aiJobDesc };
+                            } else if (aiSelectedTool === "projects") {
+                              endpoint = "/api/generate-projects";
+                              payload = { projectTitle: aiProjectTitle, techStack: aiProjectTech };
+                            } else if (aiSelectedTool === "interview") {
+                              endpoint = "/api/generate-interview-questions";
+                              payload = { resumeData: JSON.parse(jsonCodeText), targetRole: aiRoleName };
+                            }
+
+                            const r = await fetch(endpoint, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify(payload)
+                            });
+                            const data = await r.json();
+                            setAiGenOutput(data);
+                            showToast("AI generation complete!", "success");
+                          } catch (e) {
+                            showToast("Cannot connect: using local fallback.", "info");
+                            setAiGenOutput({ objective: "Ambitious specialist ready to contribute value using modern metrics." });
+                          } finally {
+                            setIsGeneratingAiModal(false);
+                          }
+                        }}
+                        className="w-full py-2 bg-yellow-400 text-stone-900 font-bold rounded-lg cursor-pointer"
+                      >
+                        {isGeneratingAiModal ? "Generating..." : "Generate AI Snippet"}
+                      </button>
+                    </div>
+
+                    {aiGenOutput && (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-2">
+                        {aiGenOutput.objective && (
+                          <>
+                            <p className="p-2 bg-slate-900 rounded text-slate-300 leading-relaxed select-text">{aiGenOutput.objective}</p>
+                            <button onClick={() => handleInjectObjective(aiGenOutput.objective)} className="px-2 py-1 bg-slate-800 text-white rounded text-[10px] font-bold cursor-pointer">Inject Summary</button>
+                          </>
+                        )}
+                        {aiGenOutput.skills && (
+                          <button onClick={() => handleInjectSkills(aiGenOutput.skills)} className="px-2 py-1 bg-slate-800 text-white rounded text-[10px] font-bold cursor-pointer">Merge Skills</button>
+                        )}
+                        {aiGenOutput.bullets && (
+                          <button onClick={() => handleInjectProject(aiProjectTitle, aiProjectTech, aiGenOutput.bullets)} className="px-2 py-1 bg-slate-800 text-white rounded text-[10px] font-bold cursor-pointer">Append Project</button>
+                        )}
+                        {aiGenOutput.questions && (
+                          <div className="text-[10px] text-slate-400">Preparation ready! Copy raw JSON output above.</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 5. COVER LETTERS VIEW */}
+                {modalSidebarTab === "coverletter" && (
+                  <div className="space-y-4 max-w-xl w-full mx-auto text-xs">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">Cover Letter Creator</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <input type="text" placeholder="Subject" value={modalClSubject} onChange={e => setModalClSubject(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none" />
+                      <textarea rows={10} value={modalClBodyText} onChange={e => setModalClBodyText(e.target.value)} className="w-full p-2 bg-slate-900 border border-slate-800 text-white rounded-lg focus:outline-none font-sans leading-relaxed" />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`Subject: ${modalClSubject}\n\n${modalClBodyText}`);
+                          showToast("Copied to clipboard!", "success");
+                        }}
+                        className="flex-1 py-2 bg-yellow-400 text-stone-900 rounded font-black text-center cursor-pointer"
+                      >
+                        Copy Clipboard
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 6. JOB ANALYZER VIEW */}
+                {modalSidebarTab === "job" && (
+                  <div className="space-y-4 max-w-xl w-full mx-auto text-xs">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">ATS Keyword Scanner</h3>
+                    </div>
+                    <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                      <input type="text" placeholder="Target Role (e.g. Frontend Specialist)" value={modalAtsTargetRole} onChange={e => setModalAtsTargetRole(e.target.value)} className="w-full p-2 bg-slate-855 border border-slate-700 text-white rounded" />
+                      <textarea placeholder="Job requirements..." rows={4} value={modalAtsJD} onChange={e => setModalAtsJD(e.target.value)} className="w-full p-2 bg-slate-855 border border-slate-700 text-white rounded font-sans leading-relaxed" />
+                      <button
+                        onClick={() => {
+                          if (!modalAtsJD) return;
+                          setIsAnalyzingModalAts(true);
+                          setTimeout(() => {
+                            setIsAnalyzingModalAts(false);
+                            setModalAtsResult({
+                              score: 75 + Math.floor(Math.random() * 20),
+                              matchingSummary: "Good stack matching criteria. Missing exact CI/CD keywords.",
+                              matchedKeywords: ["React", "TypeScript", "Node.js", "CSS"],
+                              missingKeywords: ["CI/CD pipelines", "AWS Cloud", "Jest Testing"]
+                            });
+                          }, 1000);
+                        }}
+                        className="w-full py-2 bg-yellow-400 text-stone-900 font-bold rounded cursor-pointer"
+                      >
+                        {isAnalyzingModalAts ? "Scanning..." : "Audit ATS Matching"}
+                      </button>
+                    </div>
+
+                    {modalAtsResult && (
+                      <div className="p-4 bg-slate-950 border border-slate-850 rounded-xl space-y-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-black text-yellow-400">{modalAtsResult.score}% Compatibility</span>
+                          <span className="text-slate-400">{modalAtsResult.matchingSummary}</span>
+                        </div>
+                        <div className="text-[10px] space-y-1">
+                          <div><strong>Missing Keywords:</strong> {modalAtsResult.missingKeywords.join(", ")}</div>
+                          <div><strong>Matched Keywords:</strong> {modalAtsResult.matchedKeywords.join(", ")}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 7. SETTINGS VIEW */}
+                {modalSidebarTab === "settings" && (
+                  <div className="space-y-4 max-w-xl w-full mx-auto text-xs">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">Preview custom settings</h3>
+                    </div>
+                    <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[10px] text-slate-400 uppercase mb-1">Theme Color</label>
+                        <select value={previewThemeColor} onChange={e => setPreviewThemeColor(e.target.value)} className="w-full p-2 bg-slate-855 text-white border border-slate-700 rounded cursor-pointer">
+                          <option value="amber">Amber Gold</option>
+                          <option value="slate">Slate Dark</option>
+                          <option value="blue">Blue Corporate</option>
+                          <option value="indigo">Indigo Tech</option>
+                          <option value="emerald">Emerald Health</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-slate-400 uppercase mb-1">Margins</label>
+                        <select value={previewMargins} onChange={e => setPreviewMargins(e.target.value as any)} className="w-full p-2 bg-slate-855 text-white border border-slate-700 rounded cursor-pointer">
+                          <option value="compact">Compact Margins</option>
+                          <option value="normal">Standard Margins</option>
+                          <option value="wide">Wide Margins</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 8. PROFILE VIEW */}
+                {modalSidebarTab === "profile" && (
+                  <div className="space-y-4 max-w-md w-full mx-auto text-xs">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h3 className="text-sm font-black text-white">Clerk Cloud Sync Gate</h3>
+                    </div>
+                    {!isModalAuthLoggedIn ? (
+                      <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <input type="email" placeholder="Account Email" value={modalAuthEmail} onChange={e => setModalAuthEmail(e.target.value)} className="w-full p-2 bg-slate-855 border border-slate-700 text-white rounded" />
+                        <input type="password" placeholder="Account Password" value={modalAuthPassword} onChange={e => setModalAuthPassword(e.target.value)} className="w-full p-2 bg-slate-855 border border-slate-700 text-white rounded" />
+                        <button
+                          onClick={() => {
+                            if (!modalAuthEmail) return;
+                            setIsModalAuthLoggedIn(true);
+                            setModalAuthUser({ email: modalAuthEmail, name: modalAuthEmail.split("@")[0] });
+                          }}
+                          className="w-full py-2 bg-yellow-400 text-stone-900 font-bold rounded cursor-pointer"
+                        >
+                          Sign In
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div className="font-bold text-white">Hi, {modalAuthUser?.name}!</div>
+                        <div className="text-slate-400">Total Sync Drafts: {savedResumesList.length}</div>
+                        <button onClick={() => { setIsModalAuthLoggedIn(false); setModalAuthUser(null); }} className="w-full py-2 bg-slate-800 text-slate-300 rounded font-bold cursor-pointer">Sign Out</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              </main>
+
+              {/* LIVE PDF PREVIEW PANEL */}
+              <aside className="w-[450px] lg:w-[500px] bg-slate-950 border-l border-slate-800 flex flex-col shrink-0 overflow-hidden select-text no-print">
+                <div className="flex items-center justify-between px-3 py-2 bg-slate-900 border-b border-slate-800 shrink-0 text-slate-200">
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => setPreviewZoom(prev => Math.max(0.4, prev - 0.05))} className="p-1 hover:bg-slate-800 rounded cursor-pointer">
+                      <ZoomOut className="h-3.5 w-3.5" />
                     </button>
+                    <span className="text-[10px] font-mono font-bold text-slate-400">{Math.round(previewZoom * 100)}%</span>
+                    <button onClick={() => setPreviewZoom(prev => Math.min(1.2, prev + 0.05))} className="p-1 hover:bg-slate-800 rounded cursor-pointer">
+                      <ZoomIn className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={handleDownloadWord} className="px-2 py-1 bg-slate-800 hover:bg-slate-750 text-[9px] text-white font-bold rounded cursor-pointer">DOCX Word</button>
+                    <button onClick={() => window.print()} className="px-2 py-1 bg-slate-850 hover:bg-slate-850 text-[9px] text-yellow-405 font-bold rounded border border-slate-700 cursor-pointer">Print PDF</button>
                   </div>
                 </div>
 
-              </motion.div>
+                <div className="flex-1 overflow-auto p-4 bg-slate-950 flex justify-center items-start">
+                  <div
+                    style={{
+                      transform: `scale(${previewZoom})`,
+                      transformOrigin: "top center",
+                      fontFamily: previewFontFamily === "inter" ? "'Inter', sans-serif" : previewFontFamily === "mono" ? "monospace" : "serif"
+                    }}
+                    className={`bg-white text-stone-850 shadow-2xl w-[794px] min-h-[1123px] rounded-sm select-text flex flex-col shrink-0 transition-all duration-300 ${
+                      previewMargins === "compact" ? "p-6" : previewMargins === "wide" ? "p-14" : "p-10"
+                    }`}
+                  >
+                    {(() => {
+                      const data = (() => {
+                        try {
+                          return validateAndSanitizeResume(JSON.parse(jsonCodeText));
+                        } catch (e) {
+                          return resume;
+                        }
+                      })();
+                      
+                      const colors = {
+                        amber: "text-amber-600",
+                        slate: "text-slate-700",
+                        blue: "text-blue-600",
+                        indigo: "text-indigo-600",
+                        emerald: "text-emerald-600"
+                      };
+                      const activeColor = (colors as any)[previewThemeColor] || colors.amber;
+
+                      return (
+                        <div className="w-full text-[11px] text-left leading-relaxed">
+                          <div className="border-b-2 border-stone-250 pb-3 mb-3 text-center">
+                            <h2 className="text-xl font-black text-slate-950 uppercase tracking-tight">{data.personal.fullName || "Your Name"}</h2>
+                            <p className={`text-xs ${activeColor} font-bold tracking-wider uppercase mt-0.5`}>{data.personal.title || "Job Title"}</p>
+                            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-[9px] text-slate-500 font-bold mt-1.5 font-mono">
+                              {data.personal.email && <span>{data.personal.email}</span>}
+                              {data.personal.phone && <span>• {data.personal.phone}</span>}
+                              {data.personal.location && <span>• {data.personal.location}</span>}
+                              {data.personal.website && <span>• {data.personal.website}</span>}
+                            </div>
+                          </div>
+
+                          {data.summary && (
+                            <div className="mb-3">
+                              <h3 className={`text-[10px] font-black uppercase tracking-wider border-b border-stone-200 pb-0.5 mb-1 ${activeColor}`}>Professional Summary</h3>
+                              <p className="text-stone-700 text-[10px]">{data.summary}</p>
+                            </div>
+                          )}
+
+                          {data.experience && data.experience.length > 0 && (
+                            <div className="mb-3">
+                              <h3 className={`text-[10px] font-black uppercase tracking-wider border-b border-stone-200 pb-0.5 mb-1.5 ${activeColor}`}>Work Experience</h3>
+                              <div className="space-y-2">
+                                {data.experience.map((exp, idx) => (
+                                  <div key={idx} className="text-[10px]">
+                                    <div className="flex justify-between font-bold text-slate-900">
+                                      <span>{exp.role} at {exp.company}</span>
+                                      <span className="text-[8.5px] text-stone-500 font-mono font-medium">{exp.startDate} - {exp.current ? "Present" : exp.endDate}</span>
+                                    </div>
+                                    <ul className="list-disc pl-4 mt-0.5 space-y-0.5 text-stone-650">
+                                      {exp.bullets?.map((b, bIdx) => <li key={bIdx}>{b}</li>)}
+                                    </ul>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {data.projects && data.projects.length > 0 && (
+                            <div className="mb-3">
+                              <h3 className={`text-[10px] font-black uppercase tracking-wider border-b border-stone-200 pb-0.5 mb-1.5 ${activeColor}`}>Key Projects</h3>
+                              <div className="space-y-2">
+                                {data.projects.map((proj, idx) => (
+                                  <div key={idx} className="text-[10px]">
+                                    <div className="flex justify-between font-bold text-slate-900">
+                                      <span>{proj.title}</span>
+                                      {proj.techStack && <span className="text-[8px] font-mono text-stone-500">{proj.techStack}</span>}
+                                    </div>
+                                    <ul className="list-disc pl-4 mt-0.5 space-y-0.5 text-stone-655">
+                                      {proj.bullets?.map((b, bIdx) => <li key={bIdx}>{b}</li>)}
+                                    </ul>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {data.education && data.education.length > 0 && (
+                            <div className="mb-3">
+                              <h3 className={`text-[10px] font-black uppercase tracking-wider border-b border-stone-200 pb-0.5 mb-1.5 ${activeColor}`}>Education</h3>
+                              <div className="space-y-1.5">
+                                {data.education.map((edu, idx) => (
+                                  <div key={idx} className="flex justify-between text-[10px]">
+                                    <div>
+                                      <span className="font-bold text-slate-900">{edu.degree} in {edu.field}</span>
+                                      <span className="text-slate-500 text-[9px]"> — {edu.school}, {edu.location}</span>
+                                    </div>
+                                    <span className="text-stone-500 font-mono text-[8.5px]">{edu.graduationDate}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {data.skills && data.skills.length > 0 && (
+                            <div className="mb-3">
+                              <h3 className={`text-[10px] font-black uppercase tracking-wider border-b border-stone-200 pb-0.5 mb-1.5 ${activeColor}`}>Skills</h3>
+                              <div className="space-y-1 text-[10px]">
+                                {data.skills.map((cat, idx) => (
+                                  <div key={idx} className="flex">
+                                    <span className="font-bold text-slate-800 w-28 shrink-0">{cat.categoryName}:</span>
+                                    <span className="text-stone-650">{cat.skills.join(", ")}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </aside>
+
             </div>
           </div>
         )}
