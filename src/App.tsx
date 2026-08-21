@@ -1694,8 +1694,8 @@ export default function App() {
           <title>${personal.fullName || "Resume"}</title>
           ${cssStyles}
         </head>
-        <body>
-          <div>
+        <body style="background-color: #ffffff; color: #111827;">
+          <div style="background-color: #ffffff; color: #111827; padding: 10pt;">
       `;
 
       if (resumeStyle === "brutalist") {
