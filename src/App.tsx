@@ -48,6 +48,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ResumeData, WorkExperience, Education, Project, SkillCategory, ATSCheckResult, OptimizedBulletResult, CoverLetterResult } from "./types";
 import { demoResumeData } from "./demoData";
 import { domainsAndRoles } from "./rolesData";
+import { TEMPLATES_LIBRARY, TEMPLATE_CATEGORIES, getTemplateById, TemplateItem } from "./templatesData";
 
 const INITIAL_RESUME: ResumeData = {
   personal: {
@@ -217,6 +218,30 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<string>("personal");
   const [resumeStyle, setResumeStyle] = useState<"modern" | "classic" | "tech" | "creative" | "executive" | "academic" | "chic" | "midnight" | "profile-photo" | "metro" | "editorial" | "outline" | "brutalist" | "slate" | "healthcare" | "future">("modern");
+  
+  // Track if student manually selected their own custom template
+  const [hasUserChosenTemplate, setHasUserChosenTemplate] = useState<boolean>(false);
+  
+  // 1,010 Templates Library states
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number>(1);
+  const [showTemplateModal, setShowTemplateModal] = useState<boolean>(false);
+  const [templateSearchQuery, setTemplateSearchQuery] = useState<string>("");
+  const [templateCategoryFilter, setTemplateCategoryFilter] = useState<string>("All Templates");
+  const [templatePage, setTemplatePage] = useState<number>(1);
+
+  // Helper function to set custom template choice and keep templateId in sync
+  const handleSelectTemplate = (style: string, templateId?: number) => {
+    setResumeStyle(style as any);
+    setHasUserChosenTemplate(true);
+    if (templateId) {
+      setSelectedTemplateId(templateId);
+    } else {
+      const match = TEMPLATES_LIBRARY.find(t => t.baseStyle === style);
+      if (match) {
+        setSelectedTemplateId(match.id);
+      }
+    }
+  };
   
   // Mobile Viewport states
   const [mobileActiveTab, setMobileActiveTab] = useState<"editor" | "preview">("editor");
@@ -1298,120 +1323,85 @@ export default function App() {
   };
 
   // Download DOCX compatible XML for Cover Letter
+  // Download DOCX compatible XML for Cover Letter
   const handleDownloadCoverLetterWord = () => {
-    const cssStyles = `
-      <style>
-        @page {
-          size: 8.5in 11in;
-          margin: 1.0in;
-        }
-        body {
-          font-family: 'Calibri', 'Arial', sans-serif;
-          font-size: 11pt;
-          line-height: 1.5;
-          color: #1c1917;
-          margin: 0;
-          padding: 0;
-        }
-        .header {
-          margin-bottom: 24pt;
-          border-bottom: 2px solid #e5e7eb;
-          padding-bottom: 12pt;
-        }
-        .header h1 {
-          font-family: 'Arial', sans-serif;
-          font-size: 20pt;
-          font-weight: bold;
-          color: #111111;
-          margin: 0 0 2pt 0;
-        }
-        .header-title {
-          font-size: 11pt;
-          color: #b45309;
-          text-transform: uppercase;
-          font-weight: bold;
-          margin-bottom: 8pt;
-        }
-        .header-contact {
-          font-size: 9.5pt;
-          color: #4b5563;
-        }
-        .date {
-          margin-bottom: 18pt;
-          font-weight: bold;
-        }
-        .recipient {
-          margin-bottom: 18pt;
-          line-height: 1.4;
-        }
-        .subject {
-          font-weight: bold;
-          margin-bottom: 18pt;
-          color: #111111;
-        }
-        .salutation {
-          margin-bottom: 12pt;
-        }
-        .body-p {
-          margin-bottom: 12pt;
-          text-align: justify;
-        }
-        .sign-off {
-          margin-top: 24pt;
-          line-height: 1.4;
-        }
-      </style>
-    `;
-
     const todayStr = new Date().toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
 
-    const personal = resume.personal;
+    const personal = resume.personal || { fullName: "Applicant", title: "", email: "", phone: "", location: "" };
 
     const htmlBody = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Cover Letter - ${personal.fullName || "Applicant"}</title>
-        ${cssStyles}
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+          }
+          div.Section1 { page: Section1; }
+          body {
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #111827;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+          }
+          p { margin: 0 0 12pt 0; text-align: justify; color: #111827; font-size: 11pt; }
+        </style>
       </head>
       <body>
-        <div class="header">
-          <h1>${personal.fullName || "Your Name"}</h1>
-          <div class="header-title">${personal.title || "Professional Title"}</div>
-          <div class="header-contact">
-            ${personal.email ? `Email: ${personal.email} | ` : ""}
-            ${personal.phone ? `Phone: ${personal.phone} | ` : ""}
-            ${personal.location ? `Location: ${personal.location}` : ""}
+        <div class="Section1" style="padding: 10pt; background-color: #ffffff; color: #111827;">
+          <div style="margin-bottom: 20pt; border-bottom: 2px solid #e5e7eb; padding-bottom: 12pt;">
+            <h1 style="font-family: 'Calibri', 'Segoe UI', sans-serif; font-size: 20pt; font-weight: bold; color: #0f172a; margin: 0 0 4pt 0;">${personal.fullName || "Your Name"}</h1>
+            <div style="font-size: 11pt; color: #b45309; text-transform: uppercase; font-weight: bold; margin-bottom: 6pt;">${personal.title || "Professional Title"}</div>
+            <div style="font-size: 9.5pt; color: #4b5563;">
+              ${personal.email ? `<b>Email:</b> ${personal.email} &nbsp;|&nbsp; ` : ""}
+              ${personal.phone ? `<b>Phone:</b> ${personal.phone} &nbsp;|&nbsp; ` : ""}
+              ${personal.location ? `<b>Location:</b> ${personal.location}` : ""}
+            </div>
           </div>
-        </div>
 
-        <div class="date">${todayStr}</div>
+          <div style="margin-bottom: 16pt; font-weight: bold; color: #111827; font-size: 10.5pt;">${todayStr}</div>
 
-        <div class="recipient">
-          <strong>Hiring Team</strong><br/>
-          ${clCompany || "Target Company"}<br/>
-          ${personal.location || ""}
-        </div>
+          <div style="margin-bottom: 16pt; line-height: 1.4; color: #111827; font-size: 10.5pt;">
+            <strong style="color: #0f172a;">Hiring Team</strong><br/>
+            ${clCompany || "Target Company"}<br/>
+            ${personal.location || ""}
+          </div>
 
-        <div class="subject"><b>RE:</b> ${clSubject || `Application for ${clRole}`}</div>
+          <div style="font-weight: bold; margin-bottom: 16pt; color: #0f172a; font-size: 11pt;"><b>RE:</b> ${clSubject || `Application for ${clRole}`}</div>
 
-        <div class="salutation">${clSalutation},</div>
+          <div style="margin-bottom: 12pt; color: #111827; font-size: 11pt; font-weight: 500;">${clSalutation},</div>
 
-        ${clBodyText.split("\n\n").map(p => `<p class="body-p">${p}</p>`).join("")}
+          ${clBodyText.split("\n\n").map(p => `<p style="margin-bottom: 12pt; text-align: justify; color: #111827; font-size: 11pt; line-height: 1.5;">${p}</p>`).join("")}
 
-        <div class="sign-off">
-          ${clSignOff},<br/><br/>
-          <strong>${personal.fullName || "Your Name"}</strong>
+          <div style="margin-top: 24pt; line-height: 1.4; color: #111827; font-size: 11pt;">
+            ${clSignOff},<br/><br/>
+            <strong style="color: #0f172a;">${personal.fullName || "Your Name"}</strong>
+          </div>
         </div>
       </body>
       </html>
     `;
 
     const blob = new Blob(['\ufeff' + htmlBody], {
-      type: 'application/msword'
+      type: 'application/msword;charset=utf-8'
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1442,21 +1432,18 @@ export default function App() {
       const languages = Array.isArray(activeData.languages) ? activeData.languages : [];
       const certifications = Array.isArray(activeData.certifications) ? activeData.certifications : [];
 
-      // Determine font, accent colors, and background themes based on resumeStyle
+      // Determine font and accent colors based on resumeStyle
       const isSerif = ["classic", "academic", "editorial"].includes(resumeStyle);
       const isMono = ["tech", "brutalist", "future"].includes(resumeStyle);
       const fontFamily = isSerif ? "'Georgia', 'Times New Roman', serif" : isMono ? "'Courier New', monospace" : "'Calibri', 'Segoe UI', sans-serif";
 
       let brandAccent = "#d97706"; // default amber
-      let bodyBg = "#ffffff";
-      let bodyTextColor = "#111827"; // Always crisp dark text in MS Word for 100% legibility
-
       if (resumeStyle === "healthcare") {
         brandAccent = "#059669";
       } else if (resumeStyle === "future") {
-        brandAccent = "#7e22ce"; // Rich purple accent on white
+        brandAccent = "#7e22ce";
       } else if (resumeStyle === "midnight") {
-        brandAccent = "#b45309"; // Warm amber/gold accent on white
+        brandAccent = "#b45309"; // Warm amber/gold accent for midnight template
       } else if (resumeStyle === "slate") {
         brandAccent = "#334155";
       } else if (resumeStyle === "tech") {
@@ -1465,139 +1452,14 @@ export default function App() {
         brandAccent = "#2563eb";
       }
 
-      const cssStyles = `
-        <style>
-          @page {
-            size: 8.5in 11in;
-            margin: 0.6in;
-          }
-          body {
-            font-family: ${fontFamily};
-            font-size: 10.5pt;
-            line-height: 1.45;
-            color: ${bodyTextColor};
-            background-color: ${bodyBg};
-            margin: 0;
-            padding: 0;
-          }
-          h1 {
-            font-family: ${fontFamily};
-            font-size: 22pt;
-            font-weight: bold;
-            color: #0f172a;
-            margin: 0 0 2pt 0;
-            text-transform: uppercase;
-          }
-          .subtitle {
-            font-size: 11pt;
-            font-weight: bold;
-            color: ${brandAccent};
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-bottom: 8pt;
-          }
-          .contact-row {
-            font-size: 9.5pt;
-            color: #4b5563;
-            margin-bottom: 12pt;
-            border-bottom: 1.5px solid ${brandAccent};
-            padding-bottom: 6pt;
-          }
-          .contact-item {
-            display: inline-block;
-            margin-right: 10pt;
-          }
-          .section-title {
-            font-family: ${fontFamily};
-            font-size: 11pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #0f172a;
-            border-bottom: 1.5px solid ${brandAccent};
-            padding-bottom: 2pt;
-            margin-top: 14pt;
-            margin-bottom: 6pt;
-            letter-spacing: 0.8px;
-          }
-          .summary {
-            margin-bottom: 10pt;
-            font-size: 10pt;
-            color: ${bodyTextColor};
-            text-align: justify;
-          }
-          .item-row {
-            margin-bottom: 2pt;
-            margin-top: 6pt;
-          }
-          .item-title {
-            font-weight: bold;
-            font-size: 10.5pt;
-            color: #111827;
-          }
-          .item-company {
-            font-weight: bold;
-            color: ${brandAccent};
-          }
-          .item-date {
-            float: right;
-            font-weight: bold;
-            color: #4b5563;
-            font-size: 9pt;
-          }
-          .item-meta {
-            font-size: 9pt;
-            color: #6b7280;
-            margin-bottom: 4pt;
-            font-style: italic;
-          }
-          .bullets {
-            margin: 0 0 8pt 0;
-            padding-left: 14pt;
-          }
-          .bullets li {
-            margin-bottom: 2pt;
-            font-size: 9.5pt;
-            color: ${bodyTextColor};
-          }
-          .skills-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 8pt;
-          }
-          .skills-category {
-            font-weight: bold;
-            font-size: 9.5pt;
-            color: ${bodyTextColor};
-            width: 120pt;
-            vertical-align: top;
-            padding-bottom: 3pt;
-          }
-          .skills-list {
-            font-size: 9.5pt;
-            color: ${bodyTextColor};
-            vertical-align: top;
-            padding-bottom: 3pt;
-          }
-          .plain-list {
-            margin: 0 0 8pt 0;
-            padding-left: 14pt;
-          }
-          .plain-list li {
-            margin-bottom: 2pt;
-            font-size: 9.5pt;
-            color: ${bodyTextColor};
-          }
-        </style>
-      `;
-
       const renderContactHtml = () => `
-        <div class="contact-row">
-          ${personal.email ? `<span class="contact-item"><b>Email:</b> ${personal.email}</span>` : ""}
-          ${personal.phone ? `<span class="contact-item"><b>Phone:</b> ${personal.phone}</span>` : ""}
-          ${personal.location ? `<span class="contact-item"><b>Location:</b> ${personal.location}</span>` : ""}
-          ${personal.website ? `<span class="contact-item"><b>Website:</b> ${personal.website}</span>` : ""}
-          ${personal.linkedin ? `<span class="contact-item"><b>LinkedIn:</b> ${personal.linkedin}</span>` : ""}
-          ${personal.github ? `<span class="contact-item"><b>GitHub:</b> ${personal.github}</span>` : ""}
+        <div style="font-family: ${fontFamily}; font-size: 9.5pt; color: #4b5563; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 6pt; margin-bottom: 12pt; line-height: 1.5;">
+          ${personal.email ? `<span style="display: inline-block; margin-right: 10pt; color: #374151;"><b style="color: #111827;">Email:</b> ${personal.email}</span>` : ""}
+          ${personal.phone ? `<span style="display: inline-block; margin-right: 10pt; color: #374151;"><b style="color: #111827;">Phone:</b> ${personal.phone}</span>` : ""}
+          ${personal.location ? `<span style="display: inline-block; margin-right: 10pt; color: #374151;"><b style="color: #111827;">Location:</b> ${personal.location}</span>` : ""}
+          ${personal.website ? `<span style="display: inline-block; margin-right: 10pt; color: #374151;"><b style="color: #111827;">Website:</b> ${personal.website}</span>` : ""}
+          ${personal.linkedin ? `<span style="display: inline-block; margin-right: 10pt; color: #374151;"><b style="color: #111827;">LinkedIn:</b> ${personal.linkedin}</span>` : ""}
+          ${personal.github ? `<span style="display: inline-block; margin-right: 10pt; color: #374151;"><b style="color: #111827;">GitHub:</b> ${personal.github}</span>` : ""}
         </div>
       `;
 
@@ -1605,65 +1467,82 @@ export default function App() {
         let content = "";
         if (summary) {
           content += `
-            <div class="section-title">Professional Summary</div>
-            <div class="summary">${summary}</div>
+            <div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Professional Summary</div>
+            <div style="font-family: ${fontFamily}; font-size: 10pt; color: #111827; line-height: 1.45; text-align: justify; margin-bottom: 10pt;">${summary}</div>
           `;
         }
         if (experience && experience.length > 0) {
-          content += `<div class="section-title">Work Experience</div>`;
+          content += `<div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Work Experience</div>`;
           experience.forEach(exp => {
             const dateStr = `${exp.startDate || "Start"} - ${exp.current ? "Present" : exp.endDate || "End"}`;
             content += `
-              <div class="item-row">
-                <span class="item-date">${dateStr}</span>
-                <span class="item-title">${exp.role || "Role Title"}</span> <span style="font-weight: normal;">at</span> <span class="item-company">${exp.company || "Company"}</span>
-              </div>
-              <div class="item-meta">${exp.location || "Location"}</div>
-              <ul class="bullets">
-                ${(exp.bullets || []).map(b => `<li>${b || "Bullet achievement point..."}</li>`).join("")}
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 6pt; margin-bottom: 2pt;">
+                <tr>
+                  <td style="font-family: ${fontFamily}; font-size: 10.5pt; font-weight: bold; color: #111827; text-align: left; vertical-align: top;">
+                    ${exp.role || "Role Title"} <span style="font-weight: normal; color: #4b5563;">at</span> <span style="color: ${brandAccent}; font-weight: bold;">${exp.company || "Company"}</span>
+                  </td>
+                  <td align="right" style="font-family: ${fontFamily}; font-size: 9pt; font-weight: bold; color: #4b5563; text-align: right; vertical-align: top; whitespace: nowrap;">
+                    ${dateStr}
+                  </td>
+                </tr>
+              </table>
+              <div style="font-family: ${fontFamily}; font-size: 9pt; color: #6b7280; margin-bottom: 4pt; font-style: italic;">${exp.location || "Location"}</div>
+              <ul style="margin: 0 0 8pt 0; padding-left: 14pt;">
+                ${(exp.bullets || []).map(b => `<li style="font-family: ${fontFamily}; font-size: 9.5pt; color: #111827; line-height: 1.4; margin-bottom: 2.5pt;">${b || "Bullet achievement point..."}</li>`).join("")}
               </ul>
             `;
           });
         }
         if (projects && projects.length > 0) {
-          content += `<div class="section-title">Key Projects</div>`;
+          content += `<div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Key Projects</div>`;
           projects.forEach(proj => {
             content += `
-              <div class="item-row">
-                ${proj.techStack ? `<span class="item-date"><i>${proj.techStack}</i></span>` : ""}
-                <span class="item-title">${proj.title || "Project Title"}</span>
-                ${proj.link ? ` | <span style="font-size: 9pt; color: ${brandAccent};">${proj.link}</span>` : ""}
-              </div>
-              <ul class="bullets" style="margin-top: 2pt;">
-                ${(proj.bullets || []).map(b => `<li>${b || "Project milestone..."}</li>`).join("")}
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 6pt; margin-bottom: 2pt;">
+                <tr>
+                  <td style="font-family: ${fontFamily}; font-size: 10.5pt; font-weight: bold; color: #111827; text-align: left; vertical-align: top;">
+                    ${proj.title || "Project Title"} ${proj.link ? `<span style="font-size: 9pt; font-weight: normal; color: ${brandAccent};"> | ${proj.link}</span>` : ""}
+                  </td>
+                  <td align="right" style="font-family: ${fontFamily}; font-size: 9pt; font-style: italic; color: #4b5563; text-align: right; vertical-align: top; whitespace: nowrap;">
+                    ${proj.techStack || ""}
+                  </td>
+                </tr>
+              </table>
+              <ul style="margin: 2pt 0 8pt 0; padding-left: 14pt;">
+                ${(proj.bullets || []).map(b => `<li style="font-family: ${fontFamily}; font-size: 9.5pt; color: #111827; line-height: 1.4; margin-bottom: 2.5pt;">${b || "Project milestone..."}</li>`).join("")}
               </ul>
             `;
           });
         }
         if (education && education.length > 0) {
-          content += `<div class="section-title">Education</div>`;
+          content += `<div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Education</div>`;
           education.forEach(edu => {
             content += `
-              <div class="item-row">
-                <span class="item-date">${edu.graduationDate || ""}</span>
-                <span class="item-title">${edu.degree || "Degree"} in ${edu.field || "Field of Study"}</span>
-              </div>
-              <div class="item-meta">
-                ${edu.school || "School / University"}${edu.location ? `, ${edu.location}` : ""}
-                ${edu.gpa ? ` | <b>GPA:</b> ${edu.gpa}` : ""}
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 6pt; margin-bottom: 2pt;">
+                <tr>
+                  <td style="font-family: ${fontFamily}; font-size: 10.5pt; font-weight: bold; color: #111827; text-align: left; vertical-align: top;">
+                    ${edu.degree || "Degree"} in ${edu.field || "Field of Study"}
+                  </td>
+                  <td align="right" style="font-family: ${fontFamily}; font-size: 9pt; font-weight: bold; color: #4b5563; text-align: right; vertical-align: top; whitespace: nowrap;">
+                    ${edu.graduationDate || ""}
+                  </td>
+                </tr>
+              </table>
+              <div style="font-family: ${fontFamily}; font-size: 9pt; color: #4b5563; margin-bottom: 4pt;">
+                <span style="color: #111827; font-weight: bold;">${edu.school || "School / University"}</span>${edu.location ? `, ${edu.location}` : ""}
+                ${edu.gpa ? ` &nbsp;|&nbsp; <b style="color: #111827;">GPA:</b> ${edu.gpa}` : ""}
               </div>
             `;
           });
         }
         const validSkills = skills.filter(cat => cat && Array.isArray(cat.skills) && cat.skills.length > 0);
         if (validSkills.length > 0) {
-          content += `<div class="section-title">Skills & Expertise</div>`;
-          content += `<table class="skills-table">`;
+          content += `<div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Skills & Expertise</div>`;
+          content += `<table width="100%" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 8pt;">`;
           validSkills.forEach(cat => {
             content += `
               <tr>
-                <td class="skills-category">${cat.categoryName}:</td>
-                <td class="skills-list">${cat.skills.join(", ")}</td>
+                <td style="font-family: ${fontFamily}; font-weight: bold; font-size: 9.5pt; color: #111827; width: 120pt; vertical-align: top; padding: 2.5pt 0;">${cat.categoryName}:</td>
+                <td style="font-family: ${fontFamily}; font-size: 9.5pt; color: #111827; vertical-align: top; padding: 2.5pt 0;">${cat.skills.join(", ")}</td>
               </tr>
             `;
           });
@@ -1671,17 +1550,17 @@ export default function App() {
         }
         if (certifications && certifications.length > 0) {
           content += `
-            <div class="section-title">Certifications</div>
-            <ul class="plain-list">
-              ${certifications.map(cert => `<li>${cert}</li>`).join("")}
+            <div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Certifications</div>
+            <ul style="margin: 0 0 8pt 0; padding-left: 14pt;">
+              ${certifications.map(cert => `<li style="font-family: ${fontFamily}; font-size: 9.5pt; color: #111827; margin-bottom: 2pt;">${cert}</li>`).join("")}
             </ul>
           `;
         }
         if (languages && languages.length > 0) {
           content += `
-            <div class="section-title">Languages</div>
-            <ul class="plain-list">
-              ${languages.map(lang => `<li>${lang}</li>`).join("")}
+            <div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; letter-spacing: 0.8px;">Languages</div>
+            <ul style="margin: 0 0 8pt 0; padding-left: 14pt;">
+              ${languages.map(lang => `<li style="font-family: ${fontFamily}; font-size: 9.5pt; color: #111827; margin-bottom: 2pt;">${lang}</li>`).join("")}
             </ul>
           `;
         }
@@ -1691,18 +1570,47 @@ export default function App() {
       let htmlBody = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
           <title>${personal.fullName || "Resume"}</title>
-          ${cssStyles}
+          <!--[if gte mso 9]>
+          <xml>
+            <w:WordDocument>
+              <w:View>Print</w:View>
+              <w:Zoom>100</w:Zoom>
+              <w:DoNotOptimizeForBrowser/>
+            </w:WordDocument>
+          </xml>
+          <![endif]-->
+          <style>
+            @page Section1 {
+              size: 8.5in 11.0in;
+              margin: 0.6in 0.6in 0.6in 0.6in;
+              mso-header-margin: 0.5in;
+              mso-footer-margin: 0.5in;
+              mso-paper-source: 0;
+            }
+            div.Section1 { page: Section1; }
+            body {
+              font-family: ${fontFamily};
+              font-size: 10.5pt;
+              line-height: 1.45;
+              color: #111827;
+              background-color: #ffffff;
+              margin: 0;
+              padding: 0;
+            }
+            td { font-family: ${fontFamily}; }
+          </style>
         </head>
         <body style="background-color: #ffffff; color: #111827;">
-          <div style="background-color: #ffffff; color: #111827; padding: 10pt;">
+          <div class="Section1" style="background-color: #ffffff; color: #111827; padding: 10pt;">
       `;
 
       if (resumeStyle === "brutalist") {
         htmlBody += `
-          <div style="background-color: #fde047; border: 3px solid #000; padding: 12pt; margin-bottom: 14pt;">
-            <h1 style="color: #000;">${personal.fullName || "Your Name"}</h1>
-            <div style="font-weight: bold; background: #fff; border: 2px solid #000; padding: 2pt 6pt; display: inline-block; text-transform: uppercase;">
+          <div style="background-color: #fde047; border: 3px solid #000000; padding: 12pt; margin-bottom: 14pt;">
+            <h1 style="font-family: ${fontFamily}; font-size: 22pt; font-weight: 900; color: #000000; margin: 0 0 4pt 0; text-transform: uppercase;">${personal.fullName || "Your Name"}</h1>
+            <div style="font-weight: bold; color: #000000; background: #ffffff; border: 2px solid #000000; padding: 2pt 6pt; display: inline-block; text-transform: uppercase; font-size: 10pt;">
               ${personal.title || "Target Professional Title"}
             </div>
           </div>
@@ -1716,26 +1624,26 @@ export default function App() {
             <tr>
               <td style="width: 32%; vertical-align: top; padding-right: 14pt; border-right: 1.5px solid ${brandAccent};">
                 ${personal.photoUrl ? `<div style="text-align: center; margin-bottom: 10pt;"><img src="${personal.photoUrl}" width="100" height="100" style="border-radius: 50%;" /></div>` : ""}
-                <h1 style="font-size: 16pt;">${personal.fullName || "Your Name"}</h1>
-                <div class="subtitle" style="font-size: 10pt;">${personal.title || "Target Title"}</div>
-                <div style="font-size: 9pt; color: #4b5563; margin-bottom: 12pt;">
-                  ${personal.email ? `<div><b>Email:</b> ${personal.email}</div>` : ""}
-                  ${personal.phone ? `<div><b>Phone:</b> ${personal.phone}</div>` : ""}
-                  ${personal.location ? `<div><b>Loc:</b> ${personal.location}</div>` : ""}
-                  ${personal.website ? `<div><b>Web:</b> ${personal.website}</div>` : ""}
-                  ${personal.linkedin ? `<div><b>LinkedIn:</b> ${personal.linkedin}</div>` : ""}
+                <h1 style="font-family: ${fontFamily}; font-size: 16pt; font-weight: bold; color: #0f172a; margin: 0 0 2pt 0;">${personal.fullName || "Your Name"}</h1>
+                <div style="font-family: ${fontFamily}; font-size: 10pt; font-weight: bold; color: ${brandAccent}; text-transform: uppercase; margin-bottom: 8pt;">${personal.title || "Target Title"}</div>
+                <div style="font-family: ${fontFamily}; font-size: 9pt; color: #4b5563; margin-bottom: 12pt; line-height: 1.5;">
+                  ${personal.email ? `<div><b style="color: #111827;">Email:</b> ${personal.email}</div>` : ""}
+                  ${personal.phone ? `<div><b style="color: #111827;">Phone:</b> ${personal.phone}</div>` : ""}
+                  ${personal.location ? `<div><b style="color: #111827;">Loc:</b> ${personal.location}</div>` : ""}
+                  ${personal.website ? `<div><b style="color: #111827;">Web:</b> ${personal.website}</div>` : ""}
+                  ${personal.linkedin ? `<div><b style="color: #111827;">LinkedIn:</b> ${personal.linkedin}</div>` : ""}
                 </div>
                 ${validSkills.length > 0 ? `
-                  <div class="section-title" style="font-size: 9.5pt;">Skills</div>
-                  ${validSkills.map(c => `<div style="font-size: 9pt; margin-bottom: 4pt;"><b>${c.categoryName}:</b><br/>${c.skills.join(", ")}</div>`).join("")}
+                  <div style="font-family: ${fontFamily}; font-size: 9.5pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 10pt; margin-bottom: 4pt;">Skills</div>
+                  ${validSkills.map(c => `<div style="font-family: ${fontFamily}; font-size: 9pt; color: #111827; margin-bottom: 4pt;"><b style="color: #0f172a;">${c.categoryName}:</b><br/>${c.skills.join(", ")}</div>`).join("")}
                 ` : ""}
                 ${certifications.length > 0 ? `
-                  <div class="section-title" style="font-size: 9.5pt;">Certifications</div>
-                  <ul class="plain-list" style="padding-left: 10pt;">${certifications.map(c => `<li style="font-size: 8.5pt;">${c}</li>`).join("")}</ul>
+                  <div style="font-family: ${fontFamily}; font-size: 9.5pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 10pt; margin-bottom: 4pt;">Certifications</div>
+                  <ul style="margin: 0; padding-left: 10pt;">${certifications.map(c => `<li style="font-family: ${fontFamily}; font-size: 8.5pt; color: #111827;">${c}</li>`).join("")}</ul>
                 ` : ""}
                 ${languages.length > 0 ? `
-                  <div class="section-title" style="font-size: 9.5pt;">Languages</div>
-                  <ul class="plain-list" style="padding-left: 10pt;">${languages.map(l => `<li style="font-size: 8.5pt;">${l}</li>`).join("")}</ul>
+                  <div style="font-family: ${fontFamily}; font-size: 9.5pt; font-weight: bold; text-transform: uppercase; color: #0f172a; border-bottom: 1px solid ${brandAccent}; padding-bottom: 2pt; margin-top: 10pt; margin-bottom: 4pt;">Languages</div>
+                  <ul style="margin: 0; padding-left: 10pt;">${languages.map(l => `<li style="font-family: ${fontFamily}; font-size: 8.5pt; color: #111827;">${l}</li>`).join("")}</ul>
                 ` : ""}
               </td>
               <td style="width: 68%; vertical-align: top; padding-left: 14pt;">
@@ -1746,8 +1654,8 @@ export default function App() {
         `;
       } else {
         htmlBody += `
-          <h1>${personal.fullName || "Your Name"}</h1>
-          <div class="subtitle">${personal.title || "Target Professional Title"}</div>
+          <h1 style="font-family: ${fontFamily}; font-size: 22pt; font-weight: bold; color: #0f172a; margin: 0 0 2pt 0; text-transform: uppercase;">${personal.fullName || "Your Name"}</h1>
+          <div style="font-family: ${fontFamily}; font-size: 11pt; font-weight: bold; color: ${brandAccent}; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8pt;">${personal.title || "Target Professional Title"}</div>
           ${renderContactHtml()}
           ${renderMainBody()}
         `;
@@ -2264,10 +2172,11 @@ export default function App() {
                   onClick={() => {
                     const preset = TEMPLATE_PRESETS.find(p => p.name === tpl.name);
                     if (preset) {
-                      if (preset.id.startsWith("modern")) setResumeStyle("modern");
-                      else if (preset.id.startsWith("min")) setResumeStyle("tech");
-                      else if (preset.id.startsWith("exec")) setResumeStyle("executive");
-                      else setResumeStyle(preset.id as any);
+                      let targetStyle = preset.id;
+                      if (preset.id.startsWith("modern")) targetStyle = "modern";
+                      else if (preset.id.startsWith("min")) targetStyle = "tech";
+                      else if (preset.id.startsWith("exec")) targetStyle = "executive";
+                      handleSelectTemplate(targetStyle);
                       setPreviewThemeColor(preset.color);
                       setPreviewFontFamily(preset.font as any);
                     }
@@ -2573,8 +2482,11 @@ export default function App() {
                                     setSelectedDomainIdx(result.domainIdx);
                                     setSelectedRoleName(result.roleName);
                                     const roleObj = domainsAndRoles[result.domainIdx].roles.find(r => r.role === result.roleName);
-                                    if (roleObj && roleObj.defaultTemplate) {
-                                      setResumeStyle(roleObj.defaultTemplate);
+                                    if (!hasUserChosenTemplate && roleObj && roleObj.defaultTemplate) {
+                                      const defStyle = roleObj.defaultTemplate;
+                                      setResumeStyle(defStyle);
+                                      const match = TEMPLATES_LIBRARY.find(t => t.baseStyle === defStyle);
+                                      if (match) setSelectedTemplateId(match.id);
                                     }
                                     setWizardSearchQuery("");
                                   }}
@@ -2605,8 +2517,11 @@ export default function App() {
                         const defaultRole = domainsAndRoles[idx].roles[0].role;
                         setSelectedRoleName(defaultRole);
                         const roleObj = domainsAndRoles[idx].roles[0];
-                        if (roleObj && roleObj.defaultTemplate) {
-                          setResumeStyle(roleObj.defaultTemplate);
+                        if (!hasUserChosenTemplate && roleObj && roleObj.defaultTemplate) {
+                          const defStyle = roleObj.defaultTemplate;
+                          setResumeStyle(defStyle);
+                          const match = TEMPLATES_LIBRARY.find(t => t.baseStyle === defStyle);
+                          if (match) setSelectedTemplateId(match.id);
                         }
                       }}
                       className="w-full text-xs px-3 py-2 bg-white border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 font-medium text-stone-800 shadow-sm"
@@ -2650,8 +2565,11 @@ export default function App() {
                               type="button"
                               onClick={() => {
                                 setSelectedRoleName(roleObj.role);
-                                if (roleObj.defaultTemplate) {
-                                  setResumeStyle(roleObj.defaultTemplate);
+                                if (!hasUserChosenTemplate && roleObj.defaultTemplate) {
+                                  const defStyle = roleObj.defaultTemplate;
+                                  setResumeStyle(defStyle);
+                                  const match = TEMPLATES_LIBRARY.find(t => t.baseStyle === defStyle);
+                                  if (match) setSelectedTemplateId(match.id);
                                 }
                               }}
                               className={`flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer relative group ${
@@ -3751,11 +3669,34 @@ export default function App() {
             {/* Real-time controls bar */}
             <div className="bg-white/45 backdrop-blur-xl border border-white/60 p-4 rounded-3xl shadow-neomorphic flex flex-col md:flex-row md:items-center justify-between gap-4 no-print transition-all duration-300 relative z-10">
               <div className="flex flex-col gap-1.5 grow">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Template Selection</span>
-                  <span className="text-[10px] text-stone-400 font-medium">(Switch styles instantly; details automatically flow)</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Template Selection</span>
+                    {(() => {
+                      const activeTmpl = getTemplateById(selectedTemplateId) || TEMPLATES_LIBRARY[0];
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => setShowTemplateModal(true)}
+                          className="text-[10px] bg-stone-900 hover:bg-stone-800 text-yellow-400 font-extrabold px-2 py-0.5 rounded-full border border-stone-800 flex items-center gap-1 shadow-xs cursor-pointer transition-all hover:scale-105"
+                          title="Click to view all 1,010+ templates catalog"
+                        >
+                          <span>#{activeTmpl.id} {activeTmpl.name}</span>
+                          <span className="text-[8px] text-stone-300 font-normal">({activeTmpl.category})</span>
+                        </button>
+                      );
+                    })()}
+                  </div>
+                  
+                  <button
+                    onClick={() => setShowTemplateModal(true)}
+                    className="flex items-center gap-1.5 text-xs font-black bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-stone-950 px-3.5 py-1.5 rounded-xl shadow-sm transition-all cursor-pointer border border-amber-300/40"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 fill-stone-950" />
+                    Browse 1,010+ Templates Library 🎨
+                  </button>
                 </div>
-                <div className="flex flex-wrap items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5 mt-1">
                   {[
                     { id: "modern", label: "Tech Elegant" },
                     { id: "profile-photo", label: "Staff Profile (Photo) 👤" },
@@ -3771,17 +3712,23 @@ export default function App() {
                     { id: "outline", label: "Structured Outline" },
                     { id: "brutalist", label: "Bold Brutalist" },
                     { id: "slate", label: "Slate Double-Bar" },
-                    { id: "healthcare", label: "Emerald Clean" }
+                    { id: "healthcare", label: "Emerald Clean" },
+                    { id: "future", label: "Futuristic AI ⚡" }
                   ].map(style => {
                     const isRecommended = domainsAndRoles[selectedDomainIdx]?.roles.find(r => r.role === selectedRoleName)?.defaultTemplate === style.id;
+                    const isSelected = resumeStyle === style.id;
                     return (
                       <button
                         key={style.id}
-                        onClick={() => setResumeStyle(style.id as any)}
-                        className={`text-xs px-3 py-1.5 rounded-lg border font-bold transition-all flex items-center gap-1.5 ${
-                          resumeStyle === style.id
-                            ? "bg-stone-900 text-yellow-400 border-stone-900 shadow-sm"
-                            : "bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100"
+                        type="button"
+                        onClick={() => {
+                          handleSelectTemplate(style.id as any);
+                          showToast(`Applied template style: ${style.label}`, "success");
+                        }}
+                        className={`text-xs px-3 py-1.5 rounded-lg border font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                          isSelected
+                            ? "bg-stone-900 text-yellow-400 border-stone-900 shadow-sm ring-1 ring-yellow-400/50"
+                            : "bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100 hover:border-stone-300"
                         }`}
                       >
                         <span>{style.label}</span>
@@ -5980,8 +5927,20 @@ export default function App() {
                 {/* 3. TEMPLATES VIEW */}
                 {modalSidebarTab === "templates" && (
                   <div className="space-y-4">
-                    <div className="border-b border-slate-800 pb-2">
-                      <h3 className="text-sm font-black text-white">Select Formatting Styles</h3>
+                    <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <h3 className="text-sm font-black text-white">Select Formatting Styles</h3>
+                        <p className="text-[10px] text-slate-400">Choose from quick presets or browse the complete 1,010+ template catalog.</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setShowJsonModal(false);
+                          setShowTemplateModal(true);
+                        }}
+                        className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-sm hover:from-amber-600 hover:to-yellow-500 transition-all cursor-pointer shrink-0"
+                      >
+                        🎨 Open 1,010+ Templates Library
+                      </button>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {TEMPLATE_PRESETS.slice(0, 50).map(tpl => {
@@ -5993,10 +5952,11 @@ export default function App() {
                               isApplied ? "border-yellow-400" : "border-slate-800"
                             }`}
                             onClick={() => {
-                              if (tpl.id.startsWith("modern")) setResumeStyle("modern");
-                              else if (tpl.id.startsWith("min")) setResumeStyle("tech");
-                              else if (tpl.id.startsWith("exec")) setResumeStyle("executive");
-                              else setResumeStyle(tpl.id as any);
+                              let targetStyle = tpl.id;
+                              if (tpl.id.startsWith("modern")) targetStyle = "modern";
+                              else if (tpl.id.startsWith("min")) targetStyle = "tech";
+                              else if (tpl.id.startsWith("exec")) targetStyle = "executive";
+                              handleSelectTemplate(targetStyle);
                               setPreviewThemeColor(tpl.color);
                               setPreviewFontFamily(tpl.font as any);
                               showToast(`Applied preset: ${tpl.name}!`, "success");
@@ -6741,6 +6701,253 @@ export default function App() {
         )}
       </div>
 
+      {/* 1,010 RESUME TEMPLATES LIBRARY MODAL */}
+      {showTemplateModal && (
+        <div className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto no-print">
+          <div className="bg-white rounded-3xl border border-stone-200 shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-stone-100 bg-gradient-to-r from-stone-900 via-stone-850 to-stone-900 text-white flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-yellow-400 text-stone-950 font-black text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-sm">
+                    1,010+ Templates Library
+                  </span>
+                  <span className="text-xs text-stone-300 font-medium">10 Career Categories</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white font-serif tracking-tight flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                  Choose Your Resume Template
+                </h2>
+                <p className="text-xs text-stone-300 font-normal mt-0.5">
+                  Browse through 1,010+ template designs styled for students, freshers, tech devs, executives, ATS scanners & creative fields.
+                </p>
+              </div>
+
+              {/* Search input & Close button */}
+              <div className="flex items-center gap-2.5">
+                <div className="relative min-w-[240px] sm:min-w-[300px]">
+                  <Search className="h-4 w-4 absolute left-3 top-2.5 text-stone-400" />
+                  <input
+                    type="text"
+                    value={templateSearchQuery}
+                    onChange={e => {
+                      setTemplateSearchQuery(e.target.value);
+                      setTemplatePage(1);
+                    }}
+                    placeholder="Search name, ID (#401) or role..."
+                    className="w-full pl-9 pr-8 py-2 bg-stone-800/90 border border-stone-700 text-white text-xs rounded-xl focus:outline-none focus:border-yellow-400 placeholder:text-stone-400"
+                  />
+                  {templateSearchQuery && (
+                    <button onClick={() => setTemplateSearchQuery("")} className="absolute right-2.5 top-2.5 text-stone-400 hover:text-white">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowTemplateModal(false)}
+                  className="p-2 text-stone-300 hover:text-white hover:bg-stone-800 rounded-xl transition-all cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="px-5 py-3 border-b border-stone-200 bg-stone-50 flex gap-2 overflow-x-auto scrollbar-none shrink-0">
+              {TEMPLATE_CATEGORIES.map(cat => {
+                const isSelected = templateCategoryFilter === cat;
+                const count = cat === "All Templates"
+                  ? TEMPLATES_LIBRARY.length
+                  : TEMPLATES_LIBRARY.filter(t => t.category === cat).length;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setTemplateCategoryFilter(cat);
+                      setTemplatePage(1);
+                    }}
+                    className={`text-xs px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                      isSelected
+                        ? "bg-stone-900 text-yellow-400 shadow-sm"
+                        : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-100"
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      isSelected ? "bg-yellow-400/20 text-yellow-300" : "bg-stone-100 text-stone-500 border border-stone-200"
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active Template Status Bar */}
+            <div className="px-6 py-2 bg-yellow-50/80 border-b border-yellow-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-stone-700 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-stone-900">Current Selected Template:</span>
+                {(() => {
+                  const currentTmpl = getTemplateById(selectedTemplateId) || TEMPLATES_LIBRARY[0];
+                  return (
+                    <span className="font-black bg-stone-900 text-yellow-400 px-2.5 py-0.5 rounded-md text-[11px] flex items-center gap-1.5">
+                      <span>#{currentTmpl.id} {currentTmpl.name}</span>
+                      <span className="text-[9px] text-stone-300 font-normal">({currentTmpl.category})</span>
+                    </span>
+                  );
+                })()}
+              </div>
+              <span className="text-[11px] text-stone-500 font-medium">
+                Showing {Math.min(templatePage * 48, TEMPLATES_LIBRARY.filter(tmpl => {
+                  const matchesCat = templateCategoryFilter === "All Templates" || tmpl.category === templateCategoryFilter;
+                  const q = templateSearchQuery.trim().toLowerCase();
+                  if (!q) return matchesCat;
+                  return matchesCat && (tmpl.name.toLowerCase().includes(q) || tmpl.category.toLowerCase().includes(q) || tmpl.id.toString() === q || `#${tmpl.id}`.includes(q));
+                }).length)} of {TEMPLATES_LIBRARY.filter(tmpl => {
+                  const matchesCat = templateCategoryFilter === "All Templates" || tmpl.category === templateCategoryFilter;
+                  const q = templateSearchQuery.trim().toLowerCase();
+                  if (!q) return matchesCat;
+                  return matchesCat && (tmpl.name.toLowerCase().includes(q) || tmpl.category.toLowerCase().includes(q) || tmpl.id.toString() === q || `#${tmpl.id}`.includes(q));
+                }).length} templates
+              </span>
+            </div>
+
+            {/* Template Cards Grid */}
+            <div className="p-5 sm:p-6 overflow-y-auto grow bg-stone-50/60">
+              {(() => {
+                const filtered = TEMPLATES_LIBRARY.filter(tmpl => {
+                  const matchesCategory = templateCategoryFilter === "All Templates" || tmpl.category === templateCategoryFilter;
+                  const q = templateSearchQuery.trim().toLowerCase();
+                  if (!q) return matchesCategory;
+                  return matchesCategory && (
+                    tmpl.name.toLowerCase().includes(q) ||
+                    tmpl.category.toLowerCase().includes(q) ||
+                    tmpl.id.toString() === q ||
+                    `#${tmpl.id}`.includes(q) ||
+                    tmpl.baseStyle.toLowerCase().includes(q)
+                  );
+                });
+
+                const pageSize = 48;
+                const visibleTemplates = filtered.slice(0, templatePage * pageSize);
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="py-16 text-center space-y-3">
+                      <div className="text-4xl">🔍</div>
+                      <h3 className="text-base font-bold text-stone-800">No template matching "{templateSearchQuery}"</h3>
+                      <p className="text-xs text-stone-500">Try searching for keywords like "Student", "ATS", "Executive", "Tech", or clear filters.</p>
+                      <button
+                        onClick={() => {
+                          setTemplateSearchQuery("");
+                          setTemplateCategoryFilter("All Templates");
+                        }}
+                        className="px-4 py-2 bg-stone-900 text-yellow-400 text-xs font-bold rounded-xl shadow-sm cursor-pointer"
+                      >
+                        Reset All Filters
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {visibleTemplates.map(tmpl => {
+                        const isSelected = selectedTemplateId === tmpl.id;
+                        return (
+                          <div
+                            key={tmpl.id}
+                            onClick={() => {
+                              handleSelectTemplate(tmpl.baseStyle, tmpl.id);
+                              showToast(`Applied Template #${tmpl.id}: "${tmpl.name}"`, "success");
+                            }}
+                            className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between relative group ${
+                              isSelected
+                                ? "bg-stone-900 text-white border-stone-900 shadow-lg ring-2 ring-yellow-400 scale-[1.02]"
+                                : "bg-white hover:bg-stone-50/80 text-stone-800 border-stone-200/90 hover:border-stone-400 hover:shadow-md"
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-1 mb-2">
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                  isSelected ? "bg-yellow-400 text-stone-950" : "bg-stone-100 text-stone-700 border border-stone-200"
+                                }`}>
+                                  #{tmpl.id}
+                                </span>
+                                <span className={`text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded ${
+                                  isSelected ? "bg-stone-800 text-stone-300" : "bg-stone-100 text-stone-500"
+                                }`}>
+                                  {tmpl.baseStyle}
+                                </span>
+                              </div>
+
+                              <h4 className={`text-sm font-extrabold ${isSelected ? "text-yellow-400" : "text-stone-900 group-hover:text-amber-700"} mb-1`}>
+                                {tmpl.name}
+                              </h4>
+                              
+                              <p className={`text-[10px] ${isSelected ? "text-stone-300" : "text-stone-500"} line-clamp-2 leading-relaxed mb-3`}>
+                                {tmpl.description}
+                              </p>
+                            </div>
+
+                            <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
+                              <span className={`text-[9px] font-bold ${isSelected ? "text-stone-400" : "text-stone-400"}`}>
+                                {tmpl.category}
+                              </span>
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelectTemplate(tmpl.baseStyle, tmpl.id);
+                                  showToast(`Applied Template #${tmpl.id}: "${tmpl.name}"`, "success");
+                                }}
+                                className={`text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "bg-yellow-400 text-stone-950"
+                                    : "bg-stone-900 hover:bg-stone-800 text-yellow-400"
+                                }`}
+                              >
+                                {isSelected ? "Selected ✓" : "Use Template"}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Pagination / Load More */}
+                    {visibleTemplates.length < filtered.length && (
+                      <div className="text-center pt-4">
+                        <button
+                          onClick={() => setTemplatePage(prev => prev + 1)}
+                          className="px-6 py-2.5 bg-stone-900 hover:bg-stone-800 text-yellow-400 text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
+                        >
+                          Load More Templates ({filtered.length - visibleTemplates.length} remaining)
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-stone-200 bg-white flex items-center justify-between shrink-0">
+              <span className="text-xs text-stone-500 font-medium">
+                Tip: Every template dynamically reformats your resume with instant live preview.
+              </span>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                className="px-5 py-2 bg-stone-900 text-yellow-400 text-xs font-bold rounded-xl hover:bg-stone-800 shadow-sm cursor-pointer"
+              >
+                Done / Close Catalog
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
