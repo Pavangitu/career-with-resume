@@ -1862,6 +1862,8 @@ export default function App() {
 
     try {
       const parsed = JSON.parse(text);
+      const sanitized = validateAndSanitizeResume(parsed);
+      setResume(sanitized);
       setJsonError(null);
       
       // Auto-save parsed data to active local database item
@@ -1870,7 +1872,7 @@ export default function App() {
           return {
             ...item,
             lastSaved: new Date().toLocaleString(),
-            data: parsed
+            data: sanitized
           };
         }
         return item;
@@ -6226,9 +6228,34 @@ export default function App() {
                       <ZoomIn className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="flex gap-1">
-                    <button onClick={handleDownloadWord} className="px-2 py-1 bg-slate-800 hover:bg-slate-750 text-[9px] text-white font-bold rounded cursor-pointer">DOCX Word</button>
-                    <button onClick={() => window.print()} className="px-2 py-1 bg-slate-850 hover:bg-slate-850 text-[9px] text-yellow-405 font-bold rounded border border-slate-700 cursor-pointer">Print PDF</button>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => {
+                        try {
+                          const parsed = validateAndSanitizeResume(JSON.parse(jsonCodeText));
+                          setResume(parsed);
+                        } catch (e) {}
+                        handleDownloadWord();
+                      }}
+                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-white font-bold rounded cursor-pointer transition-all"
+                    >
+                      DOCX Word
+                    </button>
+                    <button
+                      onClick={() => {
+                        try {
+                          const parsed = validateAndSanitizeResume(JSON.parse(jsonCodeText));
+                          setResume(parsed);
+                        } catch (e) {}
+                        setShowJsonModal(false);
+                        setTimeout(() => {
+                          window.print();
+                        }, 150);
+                      }}
+                      className="px-2.5 py-1 bg-yellow-400 hover:bg-yellow-500 text-[10px] text-stone-900 font-extrabold rounded cursor-pointer shadow-sm transition-all"
+                    >
+                      Print PDF
+                    </button>
                   </div>
                 </div>
 
