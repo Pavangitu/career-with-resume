@@ -1449,23 +1449,20 @@ export default function App() {
 
       let brandAccent = "#d97706"; // default amber
       let bodyBg = "#ffffff";
-      let bodyTextColor = "#1c1917";
+      let bodyTextColor = "#111827"; // Always crisp dark text in MS Word for 100% legibility
 
       if (resumeStyle === "healthcare") {
         brandAccent = "#059669";
       } else if (resumeStyle === "future") {
-        brandAccent = "#c084fc";
-        bodyBg = "#0e0b1b";
-        bodyTextColor = "#f3e8ff";
+        brandAccent = "#7e22ce"; // Rich purple accent on white
       } else if (resumeStyle === "midnight") {
-        brandAccent = "#facc15";
-        bodyBg = "#1c1a18";
-        bodyTextColor = "#f1f5f9";
+        brandAccent = "#b45309"; // Warm amber/gold accent on white
       } else if (resumeStyle === "slate") {
         brandAccent = "#334155";
-        bodyTextColor = "#1e293b";
       } else if (resumeStyle === "tech") {
         brandAccent = "#18181b";
+      } else if (resumeStyle === "executive" || resumeStyle === "creative") {
+        brandAccent = "#2563eb";
       }
 
       const cssStyles = `
@@ -1487,7 +1484,7 @@ export default function App() {
             font-family: ${fontFamily};
             font-size: 22pt;
             font-weight: bold;
-            color: ${bodyTextColor};
+            color: #0f172a;
             margin: 0 0 2pt 0;
             text-transform: uppercase;
           }
@@ -1501,7 +1498,7 @@ export default function App() {
           }
           .contact-row {
             font-size: 9.5pt;
-            color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#4b5563"};
+            color: #4b5563;
             margin-bottom: 12pt;
             border-bottom: 1.5px solid ${brandAccent};
             padding-bottom: 6pt;
@@ -1515,7 +1512,7 @@ export default function App() {
             font-size: 11pt;
             font-weight: bold;
             text-transform: uppercase;
-            color: ${bodyTextColor};
+            color: #0f172a;
             border-bottom: 1.5px solid ${brandAccent};
             padding-bottom: 2pt;
             margin-top: 14pt;
@@ -1535,7 +1532,7 @@ export default function App() {
           .item-title {
             font-weight: bold;
             font-size: 10.5pt;
-            color: ${bodyTextColor};
+            color: #111827;
           }
           .item-company {
             font-weight: bold;
@@ -1544,12 +1541,12 @@ export default function App() {
           .item-date {
             float: right;
             font-weight: bold;
-            color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#cbd5e1" : "#4b5563"};
+            color: #4b5563;
             font-size: 9pt;
           }
           .item-meta {
             font-size: 9pt;
-            color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#6b7280"};
+            color: #6b7280;
             margin-bottom: 4pt;
             font-style: italic;
           }
