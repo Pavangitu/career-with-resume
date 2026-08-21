@@ -2477,7 +2477,7 @@ export default function App() {
         </div>
 
         {/* Workspace Layout Split */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start print:block print:w-full print:m-0 print:p-0">
           
           {/* LEFT: Creator Wizard (xl:col-span-5) */}
           <section className={`xl:col-span-5 bg-white/80 backdrop-blur border border-white/30 rounded-3xl shadow-sm p-4 sm:p-5 md:p-6 sticky top-5 max-h-[calc(100vh-140px)] overflow-y-auto no-print relative z-10 transition-all duration-300 ${
@@ -3747,7 +3747,7 @@ export default function App() {
           </section>
 
           {/* RIGHT: Document Real-Time Live Preview (xl:col-span-7) */}
-          <section className={`xl:col-span-7 space-y-4 ${
+          <section className={`xl:col-span-7 space-y-4 print:block print:w-full print:m-0 print:p-0 ${
             mobileActiveTab === "preview" ? "block" : "hidden xl:block"
           }`}>
             
@@ -3825,7 +3825,7 @@ export default function App() {
             {/* Resume Letter A4 Frame Container */}
             <div className="print-wrapper bg-stone-100 p-2 sm:p-4 rounded-3xl border border-stone-200 shadow-inner overflow-x-auto w-full">
               {/* Mobile Touch Pan Tip */}
-              <div className="xl:hidden text-[10px] text-stone-500 font-bold text-center pb-2 flex items-center justify-center gap-1">
+              <div className="xl:hidden text-[10px] text-stone-500 font-bold text-center pb-2 flex items-center justify-center gap-1 no-print">
                 <span>← Swipe or scroll horizontally to pan paper preview →</span>
               </div>
               

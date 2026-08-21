@@ -41,13 +41,38 @@
     print-color-adjust: exact !important;
   }
 
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
   body * {
     visibility: hidden;
   }
 
+  /* Force layout display on parent containers of print targets */
+  *:has(.print-wrapper),
+  *:has(.print-container) {
+    display: block !important;
+    visibility: visible !important;
+  }
+
   .print-wrapper,
-  .print-wrapper * {
-    visibility: visible;
+  .print-wrapper *,
+  .print-container,
+  .print-container *,
+  .print-only,
+  .print-only * {
+    visibility: visible !important;
+  }
+
+  .print-wrapper,
+  .print-container,
+  .print-only {
+    display: block !important;
   }
 
   .no-print,
