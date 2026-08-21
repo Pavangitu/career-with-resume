@@ -1431,344 +1431,374 @@ export default function App() {
 
   // Download Word Document (.doc / .docx compatible XML matching active resumeStyle)
   const handleDownloadWord = () => {
-    const { personal, summary, experience, education, projects, skills, languages, certifications } = resume;
+    try {
+      const activeData = resume || INITIAL_RESUME;
+      const personal = activeData.personal || { fullName: "Resume", title: "", email: "", phone: "", location: "", website: "", linkedin: "", github: "" };
+      const summary = activeData.summary || "";
+      const experience = Array.isArray(activeData.experience) ? activeData.experience : [];
+      const education = Array.isArray(activeData.education) ? activeData.education : [];
+      const projects = Array.isArray(activeData.projects) ? activeData.projects : [];
+      const skills = Array.isArray(activeData.skills) ? activeData.skills : [];
+      const languages = Array.isArray(activeData.languages) ? activeData.languages : [];
+      const certifications = Array.isArray(activeData.certifications) ? activeData.certifications : [];
 
-    // Determine font, accent colors, and background themes based on resumeStyle
-    const isSerif = ["classic", "academic", "editorial"].includes(resumeStyle);
-    const isMono = ["tech", "brutalist", "future"].includes(resumeStyle);
-    const fontFamily = isSerif ? "'Georgia', 'Times New Roman', serif" : isMono ? "'Courier New', monospace" : "'Calibri', 'Segoe UI', sans-serif";
+      // Determine font, accent colors, and background themes based on resumeStyle
+      const isSerif = ["classic", "academic", "editorial"].includes(resumeStyle);
+      const isMono = ["tech", "brutalist", "future"].includes(resumeStyle);
+      const fontFamily = isSerif ? "'Georgia', 'Times New Roman', serif" : isMono ? "'Courier New', monospace" : "'Calibri', 'Segoe UI', sans-serif";
 
-    let brandAccent = "#d97706"; // default amber
-    let bodyBg = "#ffffff";
-    let bodyTextColor = "#1c1917";
-    let headerHtml = "";
+      let brandAccent = "#d97706"; // default amber
+      let bodyBg = "#ffffff";
+      let bodyTextColor = "#1c1917";
 
-    if (resumeStyle === "healthcare") {
-      brandAccent = "#059669";
-    } else if (resumeStyle === "future") {
-      brandAccent = "#c084fc";
-      bodyBg = "#0e0b1b";
-      bodyTextColor = "#f3e8ff";
-    } else if (resumeStyle === "midnight") {
-      brandAccent = "#facc15";
-      bodyBg = "#1c1a18";
-      bodyTextColor = "#f1f5f9";
-    } else if (resumeStyle === "slate") {
-      brandAccent = "#334155";
-      bodyTextColor = "#1e293b";
-    } else if (resumeStyle === "tech") {
-      brandAccent = "#18181b";
-    }
-
-    const cssStyles = `
-      <style>
-        @page {
-          size: 8.5in 11in;
-          margin: 0.6in;
-        }
-        body {
-          font-family: ${fontFamily};
-          font-size: 10.5pt;
-          line-height: 1.45;
-          color: ${bodyTextColor};
-          background-color: ${bodyBg};
-          margin: 0;
-          padding: 0;
-        }
-        h1 {
-          font-family: ${fontFamily};
-          font-size: 22pt;
-          font-weight: bold;
-          color: ${bodyTextColor};
-          margin: 0 0 2pt 0;
-          text-transform: uppercase;
-        }
-        .subtitle {
-          font-size: 11pt;
-          font-weight: bold;
-          color: ${brandAccent};
-          text-transform: uppercase;
-          letter-spacing: 1.2px;
-          margin-bottom: 8pt;
-        }
-        .contact-row {
-          font-size: 9.5pt;
-          color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#4b5563"};
-          margin-bottom: 12pt;
-          border-bottom: 1.5px solid ${brandAccent};
-          padding-bottom: 6pt;
-        }
-        .contact-item {
-          display: inline-block;
-          margin-right: 10pt;
-        }
-        .section-title {
-          font-family: ${fontFamily};
-          font-size: 11pt;
-          font-weight: bold;
-          text-transform: uppercase;
-          color: ${bodyTextColor};
-          border-bottom: 1.5px solid ${brandAccent};
-          padding-bottom: 2pt;
-          margin-top: 14pt;
-          margin-bottom: 6pt;
-          letter-spacing: 0.8px;
-        }
-        .summary {
-          margin-bottom: 10pt;
-          font-size: 10pt;
-          color: ${bodyTextColor};
-          text-align: justify;
-        }
-        .item-row {
-          margin-bottom: 2pt;
-          margin-top: 6pt;
-        }
-        .item-title {
-          font-weight: bold;
-          font-size: 10.5pt;
-          color: ${bodyTextColor};
-        }
-        .item-company {
-          font-weight: bold;
-          color: ${brandAccent};
-        }
-        .item-date {
-          float: right;
-          font-weight: bold;
-          color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#cbd5e1" : "#4b5563"};
-          font-size: 9pt;
-        }
-        .item-meta {
-          font-size: 9pt;
-          color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#6b7280"};
-          margin-bottom: 4pt;
-          font-style: italic;
-        }
-        .bullets {
-          margin: 0 0 8pt 0;
-          padding-left: 14pt;
-        }
-        .bullets li {
-          margin-bottom: 2pt;
-          font-size: 9.5pt;
-          color: ${bodyTextColor};
-        }
-        .skills-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 8pt;
-        }
-        .skills-category {
-          font-weight: bold;
-          font-size: 9.5pt;
-          color: ${bodyTextColor};
-          width: 120pt;
-          vertical-align: top;
-          padding-bottom: 3pt;
-        }
-        .skills-list {
-          font-size: 9.5pt;
-          color: ${bodyTextColor};
-          vertical-align: top;
-          padding-bottom: 3pt;
-        }
-        .plain-list {
-          margin: 0 0 8pt 0;
-          padding-left: 14pt;
-        }
-        .plain-list li {
-          margin-bottom: 2pt;
-          font-size: 9.5pt;
-          color: ${bodyTextColor};
-        }
-      </style>
-    `;
-
-    const renderContactHtml = () => `
-      <div class="contact-row">
-        ${personal.email ? `<span class="contact-item"><b>Email:</b> ${personal.email}</span>` : ""}
-        ${personal.phone ? `<span class="contact-item"><b>Phone:</b> ${personal.phone}</span>` : ""}
-        ${personal.location ? `<span class="contact-item"><b>Location:</b> ${personal.location}</span>` : ""}
-        ${personal.website ? `<span class="contact-item"><b>Website:</b> ${personal.website}</span>` : ""}
-        ${personal.linkedin ? `<span class="contact-item"><b>LinkedIn:</b> ${personal.linkedin}</span>` : ""}
-        ${personal.github ? `<span class="contact-item"><b>GitHub:</b> ${personal.github}</span>` : ""}
-      </div>
-    `;
-
-    const renderMainBody = () => {
-      let content = "";
-      if (summary) {
-        content += `
-          <div class="section-title">Professional Summary</div>
-          <div class="summary">${summary}</div>
-        `;
+      if (resumeStyle === "healthcare") {
+        brandAccent = "#059669";
+      } else if (resumeStyle === "future") {
+        brandAccent = "#c084fc";
+        bodyBg = "#0e0b1b";
+        bodyTextColor = "#f3e8ff";
+      } else if (resumeStyle === "midnight") {
+        brandAccent = "#facc15";
+        bodyBg = "#1c1a18";
+        bodyTextColor = "#f1f5f9";
+      } else if (resumeStyle === "slate") {
+        brandAccent = "#334155";
+        bodyTextColor = "#1e293b";
+      } else if (resumeStyle === "tech") {
+        brandAccent = "#18181b";
       }
-      if (experience && experience.length > 0) {
-        content += `<div class="section-title">Work Experience</div>`;
-        experience.forEach(exp => {
-          const dateStr = `${exp.startDate || "Start"} - ${exp.current ? "Present" : exp.endDate || "End"}`;
-          content += `
-            <div class="item-row">
-              <span class="item-date">${dateStr}</span>
-              <span class="item-title">${exp.role || "Role Title"}</span> <span style="font-weight: normal;">at</span> <span class="item-company">${exp.company || "Company"}</span>
-            </div>
-            <div class="item-meta">${exp.location || "Location"}</div>
-            <ul class="bullets">
-              ${exp.bullets.map(b => `<li>${b || "Bullet achievement point..."}</li>`).join("")}
-            </ul>
-          `;
-        });
-      }
-      if (projects && projects.length > 0) {
-        content += `<div class="section-title">Key Projects</div>`;
-        projects.forEach(proj => {
-          content += `
-            <div class="item-row">
-              ${proj.techStack ? `<span class="item-date"><i>${proj.techStack}</i></span>` : ""}
-              <span class="item-title">${proj.title || "Project Title"}</span>
-              ${proj.link ? ` | <span style="font-size: 9pt; color: ${brandAccent};">${proj.link}</span>` : ""}
-            </div>
-            <ul class="bullets" style="margin-top: 2pt;">
-              ${proj.bullets.map(b => `<li>${b || "Project milestone..."}</li>`).join("")}
-            </ul>
-          `;
-        });
-      }
-      if (education && education.length > 0) {
-        content += `<div class="section-title">Education</div>`;
-        education.forEach(edu => {
-          content += `
-            <div class="item-row">
-              <span class="item-date">${edu.graduationDate || ""}</span>
-              <span class="item-title">${edu.degree || "Degree"} in ${edu.field || "Field of Study"}</span>
-            </div>
-            <div class="item-meta">
-              ${edu.school || "School / University"}${edu.location ? `, ${edu.location}` : ""}
-              ${edu.gpa ? ` | <b>GPA:</b> ${edu.gpa}` : ""}
-            </div>
-          `;
-        });
-      }
-      const validSkills = skills.filter(cat => cat.skills.length > 0);
-      if (validSkills.length > 0) {
-        content += `<div class="section-title">Skills & Expertise</div>`;
-        content += `<table class="skills-table">`;
-        validSkills.forEach(cat => {
-          content += `
-            <tr>
-              <td class="skills-category">${cat.categoryName}:</td>
-              <td class="skills-list">${cat.skills.join(", ")}</td>
-            </tr>
-          `;
-        });
-        content += `</table>`;
-      }
-      if (certifications && certifications.length > 0) {
-        content += `
-          <div class="section-title">Certifications</div>
-          <ul class="plain-list">
-            ${certifications.map(cert => `<li>${cert}</li>`).join("")}
-          </ul>
-        `;
-      }
-      if (languages && languages.length > 0) {
-        content += `
-          <div class="section-title">Languages</div>
-          <ul class="plain-list">
-            ${languages.map(lang => `<li>${lang}</li>`).join("")}
-          </ul>
-        `;
-      }
-      return content;
-    };
 
-    let htmlBody = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head>
-        <title>${personal.fullName || "Resume"}</title>
-        ${cssStyles}
-      </head>
-      <body>
-        <div>
-    `;
-
-    if (resumeStyle === "brutalist") {
-      htmlBody += `
-        <div style="background-color: #fde047; border: 3px solid #000; padding: 12pt; margin-bottom: 14pt;">
-          <h1 style="color: #000;">${personal.fullName || "Your Name"}</h1>
-          <div style="font-weight: bold; background: #fff; border: 2px solid #000; padding: 2pt 6pt; display: inline-block; text-transform: uppercase;">
-            ${personal.title || "Target Professional Title"}
-          </div>
-        </div>
-        ${renderContactHtml()}
-        ${renderMainBody()}
+      const cssStyles = `
+        <style>
+          @page {
+            size: 8.5in 11in;
+            margin: 0.6in;
+          }
+          body {
+            font-family: ${fontFamily};
+            font-size: 10.5pt;
+            line-height: 1.45;
+            color: ${bodyTextColor};
+            background-color: ${bodyBg};
+            margin: 0;
+            padding: 0;
+          }
+          h1 {
+            font-family: ${fontFamily};
+            font-size: 22pt;
+            font-weight: bold;
+            color: ${bodyTextColor};
+            margin: 0 0 2pt 0;
+            text-transform: uppercase;
+          }
+          .subtitle {
+            font-size: 11pt;
+            font-weight: bold;
+            color: ${brandAccent};
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 8pt;
+          }
+          .contact-row {
+            font-size: 9.5pt;
+            color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#4b5563"};
+            margin-bottom: 12pt;
+            border-bottom: 1.5px solid ${brandAccent};
+            padding-bottom: 6pt;
+          }
+          .contact-item {
+            display: inline-block;
+            margin-right: 10pt;
+          }
+          .section-title {
+            font-family: ${fontFamily};
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: ${bodyTextColor};
+            border-bottom: 1.5px solid ${brandAccent};
+            padding-bottom: 2pt;
+            margin-top: 14pt;
+            margin-bottom: 6pt;
+            letter-spacing: 0.8px;
+          }
+          .summary {
+            margin-bottom: 10pt;
+            font-size: 10pt;
+            color: ${bodyTextColor};
+            text-align: justify;
+          }
+          .item-row {
+            margin-bottom: 2pt;
+            margin-top: 6pt;
+          }
+          .item-title {
+            font-weight: bold;
+            font-size: 10.5pt;
+            color: ${bodyTextColor};
+          }
+          .item-company {
+            font-weight: bold;
+            color: ${brandAccent};
+          }
+          .item-date {
+            float: right;
+            font-weight: bold;
+            color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#cbd5e1" : "#4b5563"};
+            font-size: 9pt;
+          }
+          .item-meta {
+            font-size: 9pt;
+            color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#6b7280"};
+            margin-bottom: 4pt;
+            font-style: italic;
+          }
+          .bullets {
+            margin: 0 0 8pt 0;
+            padding-left: 14pt;
+          }
+          .bullets li {
+            margin-bottom: 2pt;
+            font-size: 9.5pt;
+            color: ${bodyTextColor};
+          }
+          .skills-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8pt;
+          }
+          .skills-category {
+            font-weight: bold;
+            font-size: 9.5pt;
+            color: ${bodyTextColor};
+            width: 120pt;
+            vertical-align: top;
+            padding-bottom: 3pt;
+          }
+          .skills-list {
+            font-size: 9.5pt;
+            color: ${bodyTextColor};
+            vertical-align: top;
+            padding-bottom: 3pt;
+          }
+          .plain-list {
+            margin: 0 0 8pt 0;
+            padding-left: 14pt;
+          }
+          .plain-list li {
+            margin-bottom: 2pt;
+            font-size: 9.5pt;
+            color: ${bodyTextColor};
+          }
+        </style>
       `;
-    } else if (resumeStyle === "creative" || resumeStyle === "profile-photo") {
-      // 2-Column Side-by-Side Table for Creative & Profile-Photo templates in DOCX
-      const validSkills = skills.filter(cat => cat.skills.length > 0);
-      htmlBody += `
-        <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="width: 32%; vertical-align: top; padding-right: 14pt; border-right: 1.5px solid ${brandAccent};">
-              ${personal.photoUrl ? `<div style="text-align: center; margin-bottom: 10pt;"><img src="${personal.photoUrl}" width="100" height="100" style="border-radius: 50%;" /></div>` : ""}
-              <h1 style="font-size: 16pt;">${personal.fullName || "Your Name"}</h1>
-              <div class="subtitle" style="font-size: 10pt;">${personal.title || "Target Title"}</div>
-              <div style="font-size: 9pt; color: #4b5563; margin-bottom: 12pt;">
-                ${personal.email ? `<div><b>Email:</b> ${personal.email}</div>` : ""}
-                ${personal.phone ? `<div><b>Phone:</b> ${personal.phone}</div>` : ""}
-                ${personal.location ? `<div><b>Loc:</b> ${personal.location}</div>` : ""}
-                ${personal.website ? `<div><b>Web:</b> ${personal.website}</div>` : ""}
-                ${personal.linkedin ? `<div><b>LinkedIn:</b> ${personal.linkedin}</div>` : ""}
+
+      const renderContactHtml = () => `
+        <div class="contact-row">
+          ${personal.email ? `<span class="contact-item"><b>Email:</b> ${personal.email}</span>` : ""}
+          ${personal.phone ? `<span class="contact-item"><b>Phone:</b> ${personal.phone}</span>` : ""}
+          ${personal.location ? `<span class="contact-item"><b>Location:</b> ${personal.location}</span>` : ""}
+          ${personal.website ? `<span class="contact-item"><b>Website:</b> ${personal.website}</span>` : ""}
+          ${personal.linkedin ? `<span class="contact-item"><b>LinkedIn:</b> ${personal.linkedin}</span>` : ""}
+          ${personal.github ? `<span class="contact-item"><b>GitHub:</b> ${personal.github}</span>` : ""}
+        </div>
+      `;
+
+      const renderMainBody = () => {
+        let content = "";
+        if (summary) {
+          content += `
+            <div class="section-title">Professional Summary</div>
+            <div class="summary">${summary}</div>
+          `;
+        }
+        if (experience && experience.length > 0) {
+          content += `<div class="section-title">Work Experience</div>`;
+          experience.forEach(exp => {
+            const dateStr = `${exp.startDate || "Start"} - ${exp.current ? "Present" : exp.endDate || "End"}`;
+            content += `
+              <div class="item-row">
+                <span class="item-date">${dateStr}</span>
+                <span class="item-title">${exp.role || "Role Title"}</span> <span style="font-weight: normal;">at</span> <span class="item-company">${exp.company || "Company"}</span>
               </div>
-              ${validSkills.length > 0 ? `
-                <div class="section-title" style="font-size: 9.5pt;">Skills</div>
-                ${validSkills.map(c => `<div style="font-size: 9pt; margin-bottom: 4pt;"><b>${c.categoryName}:</b><br/>${c.skills.join(", ")}</div>`).join("")}
-              ` : ""}
-              ${certifications.length > 0 ? `
-                <div class="section-title" style="font-size: 9.5pt;">Certifications</div>
-                <ul class="plain-list" style="padding-left: 10pt;">${certifications.map(c => `<li style="font-size: 8.5pt;">${c}</li>`).join("")}</ul>
-              ` : ""}
-              ${languages.length > 0 ? `
-                <div class="section-title" style="font-size: 9.5pt;">Languages</div>
-                <ul class="plain-list" style="padding-left: 10pt;">${languages.map(l => `<li style="font-size: 8.5pt;">${l}</li>`).join("")}</ul>
-              ` : ""}
-            </td>
-            <td style="width: 68%; vertical-align: top; padding-left: 14pt;">
-              ${renderMainBody()}
-            </td>
-          </tr>
-        </table>
+              <div class="item-meta">${exp.location || "Location"}</div>
+              <ul class="bullets">
+                ${(exp.bullets || []).map(b => `<li>${b || "Bullet achievement point..."}</li>`).join("")}
+              </ul>
+            `;
+          });
+        }
+        if (projects && projects.length > 0) {
+          content += `<div class="section-title">Key Projects</div>`;
+          projects.forEach(proj => {
+            content += `
+              <div class="item-row">
+                ${proj.techStack ? `<span class="item-date"><i>${proj.techStack}</i></span>` : ""}
+                <span class="item-title">${proj.title || "Project Title"}</span>
+                ${proj.link ? ` | <span style="font-size: 9pt; color: ${brandAccent};">${proj.link}</span>` : ""}
+              </div>
+              <ul class="bullets" style="margin-top: 2pt;">
+                ${(proj.bullets || []).map(b => `<li>${b || "Project milestone..."}</li>`).join("")}
+              </ul>
+            `;
+          });
+        }
+        if (education && education.length > 0) {
+          content += `<div class="section-title">Education</div>`;
+          education.forEach(edu => {
+            content += `
+              <div class="item-row">
+                <span class="item-date">${edu.graduationDate || ""}</span>
+                <span class="item-title">${edu.degree || "Degree"} in ${edu.field || "Field of Study"}</span>
+              </div>
+              <div class="item-meta">
+                ${edu.school || "School / University"}${edu.location ? `, ${edu.location}` : ""}
+                ${edu.gpa ? ` | <b>GPA:</b> ${edu.gpa}` : ""}
+              </div>
+            `;
+          });
+        }
+        const validSkills = skills.filter(cat => cat && Array.isArray(cat.skills) && cat.skills.length > 0);
+        if (validSkills.length > 0) {
+          content += `<div class="section-title">Skills & Expertise</div>`;
+          content += `<table class="skills-table">`;
+          validSkills.forEach(cat => {
+            content += `
+              <tr>
+                <td class="skills-category">${cat.categoryName}:</td>
+                <td class="skills-list">${cat.skills.join(", ")}</td>
+              </tr>
+            `;
+          });
+          content += `</table>`;
+        }
+        if (certifications && certifications.length > 0) {
+          content += `
+            <div class="section-title">Certifications</div>
+            <ul class="plain-list">
+              ${certifications.map(cert => `<li>${cert}</li>`).join("")}
+            </ul>
+          `;
+        }
+        if (languages && languages.length > 0) {
+          content += `
+            <div class="section-title">Languages</div>
+            <ul class="plain-list">
+              ${languages.map(lang => `<li>${lang}</li>`).join("")}
+            </ul>
+          `;
+        }
+        return content;
+      };
+
+      let htmlBody = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <title>${personal.fullName || "Resume"}</title>
+          ${cssStyles}
+        </head>
+        <body>
+          <div>
       `;
-    } else {
-      // Single-column templates (modern, classic, executive, tech, academic, healthcare, future, slate, chic, etc.)
+
+      if (resumeStyle === "brutalist") {
+        htmlBody += `
+          <div style="background-color: #fde047; border: 3px solid #000; padding: 12pt; margin-bottom: 14pt;">
+            <h1 style="color: #000;">${personal.fullName || "Your Name"}</h1>
+            <div style="font-weight: bold; background: #fff; border: 2px solid #000; padding: 2pt 6pt; display: inline-block; text-transform: uppercase;">
+              ${personal.title || "Target Professional Title"}
+            </div>
+          </div>
+          ${renderContactHtml()}
+          ${renderMainBody()}
+        `;
+      } else if (resumeStyle === "creative" || resumeStyle === "profile-photo") {
+        const validSkills = skills.filter(cat => cat && Array.isArray(cat.skills) && cat.skills.length > 0);
+        htmlBody += `
+          <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="width: 32%; vertical-align: top; padding-right: 14pt; border-right: 1.5px solid ${brandAccent};">
+                ${personal.photoUrl ? `<div style="text-align: center; margin-bottom: 10pt;"><img src="${personal.photoUrl}" width="100" height="100" style="border-radius: 50%;" /></div>` : ""}
+                <h1 style="font-size: 16pt;">${personal.fullName || "Your Name"}</h1>
+                <div class="subtitle" style="font-size: 10pt;">${personal.title || "Target Title"}</div>
+                <div style="font-size: 9pt; color: #4b5563; margin-bottom: 12pt;">
+                  ${personal.email ? `<div><b>Email:</b> ${personal.email}</div>` : ""}
+                  ${personal.phone ? `<div><b>Phone:</b> ${personal.phone}</div>` : ""}
+                  ${personal.location ? `<div><b>Loc:</b> ${personal.location}</div>` : ""}
+                  ${personal.website ? `<div><b>Web:</b> ${personal.website}</div>` : ""}
+                  ${personal.linkedin ? `<div><b>LinkedIn:</b> ${personal.linkedin}</div>` : ""}
+                </div>
+                ${validSkills.length > 0 ? `
+                  <div class="section-title" style="font-size: 9.5pt;">Skills</div>
+                  ${validSkills.map(c => `<div style="font-size: 9pt; margin-bottom: 4pt;"><b>${c.categoryName}:</b><br/>${c.skills.join(", ")}</div>`).join("")}
+                ` : ""}
+                ${certifications.length > 0 ? `
+                  <div class="section-title" style="font-size: 9.5pt;">Certifications</div>
+                  <ul class="plain-list" style="padding-left: 10pt;">${certifications.map(c => `<li style="font-size: 8.5pt;">${c}</li>`).join("")}</ul>
+                ` : ""}
+                ${languages.length > 0 ? `
+                  <div class="section-title" style="font-size: 9.5pt;">Languages</div>
+                  <ul class="plain-list" style="padding-left: 10pt;">${languages.map(l => `<li style="font-size: 8.5pt;">${l}</li>`).join("")}</ul>
+                ` : ""}
+              </td>
+              <td style="width: 68%; vertical-align: top; padding-left: 14pt;">
+                ${renderMainBody()}
+              </td>
+            </tr>
+          </table>
+        `;
+      } else {
+        htmlBody += `
+          <h1>${personal.fullName || "Your Name"}</h1>
+          <div class="subtitle">${personal.title || "Target Professional Title"}</div>
+          ${renderContactHtml()}
+          ${renderMainBody()}
+        `;
+      }
+
       htmlBody += `
-        <h1>${personal.fullName || "Your Name"}</h1>
-        <div class="subtitle">${personal.title || "Target Professional Title"}</div>
-        ${renderContactHtml()}
-        ${renderMainBody()}
+          </div>
+        </body>
+        </html>
       `;
+
+      const filename = `${(personal.fullName || "Resume").replace(/\s+/g, "_")}_${resumeStyle.toUpperCase()}_Resume.doc`;
+      const fullContent = '\ufeff' + htmlBody;
+
+      try {
+        const blob = new Blob([fullContent], { type: 'application/msword;charset=utf-8' });
+        if ((window.navigator as any).msSaveOrOpenBlob) {
+          (window.navigator as any).msSaveOrOpenBlob(blob, filename);
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 250);
+        }
+      } catch (err) {
+        // Mobile webview Data URI fallback
+        const encodedUri = 'data:application/msword;charset=utf-8,' + encodeURIComponent(fullContent);
+        const link = document.createElement('a');
+        link.href = encodedUri;
+        link.download = filename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      showToast(`Word document exported in ${resumeStyle.toUpperCase()} template!`, "success");
+    } catch (err: any) {
+      console.error("Word Download Error:", err);
+      showToast("Download failed: " + (err.message || "Unknown error"), "error");
     }
-
-    htmlBody += `
-        </div>
-      </body>
-      </html>
-    `;
-
-    // Convert string to blob and prompt download
-    const blob = new Blob(['\ufeff' + htmlBody], {
-      type: 'application/msword'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${(personal.fullName || "Resume").replace(/\s+/g, "_")}_${resumeStyle.toUpperCase()}_Resume.doc`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast(`Word document exported in ${resumeStyle.toUpperCase()} template!`, "success");
   };
 
   // ================= NEW OVERLAY RESUME ENGINE HELPER FUNCTIONS =================
@@ -3769,7 +3799,7 @@ export default function App() {
 
               <div className="flex flex-wrap items-center gap-2">
                 <button
-                  onClick={() => setShowPdfGuide(true)}
+                  onClick={() => window.print()}
                   className="flex items-center gap-1.5 text-xs font-bold bg-stone-900 hover:bg-stone-800 text-yellow-400 px-3.5 py-1.5 rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   <FileDown className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -3781,6 +3811,13 @@ export default function App() {
                 >
                   <FileText className="h-3.5 w-3.5 stroke-[2.5]" />
                   Download Word (.doc)
+                </button>
+                <button
+                  onClick={() => setShowPdfGuide(true)}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-all cursor-pointer text-xs font-bold"
+                  title="PDF Print Guidelines"
+                >
+                  <HelpCircle className="h-4 w-4" />
                 </button>
               </div>
             </div>
