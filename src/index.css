@@ -1,6 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 
+:root {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --shadow-neomorphic: 3px 3px 6px rgba(92, 32, 24, 0.06), -3px -3px 6px rgba(255, 255, 255, 0.9);
+  --shadow-neomorphic-inset: inset 2px 2px 5px rgba(92, 32, 24, 0.06), inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+  
+  --color-petra-blue: #4285F4;
+  --color-petra-brown: #5C2018;
+  --color-petra-terracotta: #BC4639;
+  --color-petra-sand: #D4A59A;
+  --color-petra-ivory: #F3E0DC;
+}
+
 @theme {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
@@ -20,34 +34,41 @@
   display: none !important;
 }
 
-/* Print utilities for clean PDF download */
+/* Print utilities for clean, pixel-perfect PDF download */
 @media print {
-  body {
-    background: white !important;
-    color: black !important;
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  .no-print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-wrapper,
+  .print-wrapper * {
+    visibility: visible;
+  }
+
+  .no-print,
+  .no-print * {
     display: none !important;
+    visibility: hidden !important;
   }
+
   .print-only {
     display: block !important;
   }
-  
-  /* Reset grid layouts and spacing during print */
-  .grid, [class*="grid-cols-"] {
-    display: block !important;
-    gap: 0 !important;
-  }
-  .xl\:col-span-7, .lg\:col-span-7 {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  
+
   .print-wrapper {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: transparent !important;
     border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
     box-shadow: none !important;
     overflow: visible !important;
   }
@@ -58,17 +79,48 @@
   }
 
   .print-container {
-    width: 210mm !important;
-    height: 297mm !important;
-    max-height: 297mm !important;
+    width: 100% !important;
+    max-width: 210mm !important;
+    height: auto !important;
+    max-height: none !important;
     box-shadow: none !important;
     border: none !important;
-    background: white !important;
-    page-break-after: avoid !important;
-    page-break-before: avoid !important;
-    page-break-inside: avoid !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    transform: none !important;
+    margin: 0 auto !important;
     box-sizing: border-box !important;
+  }
+
+  /* Retain CSS grid structures for multi-column and split-panel template layouts */
+  .grid {
+    display: grid !important;
+  }
+  .grid-cols-12 {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  }
+  .grid-cols-1 {
+    display: grid !important;
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  .grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .col-span-4 {
+    grid-column: span 4 / span 4 !important;
+  }
+  .col-span-8 {
+    grid-column: span 8 / span 8 !important;
+  }
+  .col-span-5 {
+    grid-column: span 5 / span 5 !important;
+  }
+  .col-span-7 {
+    grid-column: span 7 / span 7 !important;
+  }
+  .col-span-12 {
+    grid-column: span 12 / span 12 !important;
   }
 }
 
@@ -159,6 +211,7 @@
 .text-gold-stone-glow {
   background: linear-gradient(to right, #b45309, #d97706, #f59e0b, #fbbf24, #d97706);
   background-size: 200% auto;
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: gold-glow-flow 6s linear infinite;
@@ -229,12 +282,14 @@
 /* Modern Gradient Text */
 .text-indigo-glow {
   background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gold-gradient {
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

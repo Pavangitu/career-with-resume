@@ -218,6 +218,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>("personal");
   const [resumeStyle, setResumeStyle] = useState<"modern" | "classic" | "tech" | "creative" | "executive" | "academic" | "chic" | "midnight" | "profile-photo" | "metro" | "editorial" | "outline" | "brutalist" | "slate" | "healthcare" | "future">("modern");
   
+  // Mobile Viewport states
+  const [mobileActiveTab, setMobileActiveTab] = useState<"editor" | "preview">("editor");
+  const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
+
   // A4 Page fitting states
   const [pageFitScale, setPageFitScale] = useState<number>(1);
   const [forceSinglePage, setForceSinglePage] = useState<boolean>(true);
@@ -1425,134 +1429,259 @@ export default function App() {
     window.print();
   };
 
-  // Download Word Document (.doc / .docx compatible XML)
+  // Download Word Document (.doc / .docx compatible XML matching active resumeStyle)
   const handleDownloadWord = () => {
     const { personal, summary, experience, education, projects, skills, languages, certifications } = resume;
 
-    // Create a beautifully formatted HTML/CSS body matching professional standards
+    // Determine font, accent colors, and background themes based on resumeStyle
+    const isSerif = ["classic", "academic", "editorial"].includes(resumeStyle);
+    const isMono = ["tech", "brutalist", "future"].includes(resumeStyle);
+    const fontFamily = isSerif ? "'Georgia', 'Times New Roman', serif" : isMono ? "'Courier New', monospace" : "'Calibri', 'Segoe UI', sans-serif";
+
+    let brandAccent = "#d97706"; // default amber
+    let bodyBg = "#ffffff";
+    let bodyTextColor = "#1c1917";
+    let headerHtml = "";
+
+    if (resumeStyle === "healthcare") {
+      brandAccent = "#059669";
+    } else if (resumeStyle === "future") {
+      brandAccent = "#c084fc";
+      bodyBg = "#0e0b1b";
+      bodyTextColor = "#f3e8ff";
+    } else if (resumeStyle === "midnight") {
+      brandAccent = "#facc15";
+      bodyBg = "#1c1a18";
+      bodyTextColor = "#f1f5f9";
+    } else if (resumeStyle === "slate") {
+      brandAccent = "#334155";
+      bodyTextColor = "#1e293b";
+    } else if (resumeStyle === "tech") {
+      brandAccent = "#18181b";
+    }
+
     const cssStyles = `
       <style>
         @page {
           size: 8.5in 11in;
-          margin: 0.75in;
+          margin: 0.6in;
         }
         body {
-          font-family: 'Calibri', 'Arial', sans-serif;
-          font-size: 11pt;
+          font-family: ${fontFamily};
+          font-size: 10.5pt;
           line-height: 1.45;
-          color: #1c1917;
+          color: ${bodyTextColor};
+          background-color: ${bodyBg};
           margin: 0;
           padding: 0;
         }
         h1 {
-          font-family: 'Arial', sans-serif;
+          font-family: ${fontFamily};
           font-size: 22pt;
           font-weight: bold;
-          color: #111111;
+          color: ${bodyTextColor};
           margin: 0 0 2pt 0;
           text-transform: uppercase;
         }
         .subtitle {
-          font-size: 11.5pt;
+          font-size: 11pt;
           font-weight: bold;
-          color: #b45309; /* Elegant amber brand color */
+          color: ${brandAccent};
           text-transform: uppercase;
-          letter-spacing: 1.5px;
+          letter-spacing: 1.2px;
           margin-bottom: 8pt;
         }
         .contact-row {
           font-size: 9.5pt;
-          color: #4b5563;
-          margin-bottom: 14pt;
-          border-bottom: 2px solid #e5e7eb;
-          padding-bottom: 8pt;
+          color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#4b5563"};
+          margin-bottom: 12pt;
+          border-bottom: 1.5px solid ${brandAccent};
+          padding-bottom: 6pt;
         }
         .contact-item {
           display: inline-block;
-          margin-right: 12pt;
+          margin-right: 10pt;
         }
         .section-title {
-          font-family: 'Arial', sans-serif;
+          font-family: ${fontFamily};
           font-size: 11pt;
           font-weight: bold;
           text-transform: uppercase;
-          color: #111111;
-          border-bottom: 1.5px solid #d97706; /* Bold amber theme divider */
+          color: ${bodyTextColor};
+          border-bottom: 1.5px solid ${brandAccent};
           padding-bottom: 2pt;
-          margin-top: 16pt;
+          margin-top: 14pt;
           margin-bottom: 6pt;
           letter-spacing: 0.8px;
         }
         .summary {
           margin-bottom: 10pt;
           font-size: 10pt;
-          color: #374151;
+          color: ${bodyTextColor};
           text-align: justify;
         }
         .item-row {
-          margin-bottom: 3pt;
-          margin-top: 8pt;
+          margin-bottom: 2pt;
+          margin-top: 6pt;
         }
         .item-title {
           font-weight: bold;
           font-size: 10.5pt;
-          color: #111111;
+          color: ${bodyTextColor};
         }
         .item-company {
           font-weight: bold;
-          color: #4b5563;
+          color: ${brandAccent};
         }
         .item-date {
           float: right;
           font-weight: bold;
-          color: #4b5563;
-          font-size: 9.5pt;
+          color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#cbd5e1" : "#4b5563"};
+          font-size: 9pt;
         }
         .item-meta {
           font-size: 9pt;
-          color: #6b7280;
+          color: ${resumeStyle === "future" || resumeStyle === "midnight" ? "#94a3b8" : "#6b7280"};
           margin-bottom: 4pt;
           font-style: italic;
         }
         .bullets {
-          margin: 0 0 10pt 0;
-          padding-left: 15pt;
+          margin: 0 0 8pt 0;
+          padding-left: 14pt;
         }
         .bullets li {
-          margin-bottom: 2.5pt;
-          font-size: 10pt;
-          color: #374151;
+          margin-bottom: 2pt;
+          font-size: 9.5pt;
+          color: ${bodyTextColor};
         }
         .skills-table {
           width: 100%;
           border-collapse: collapse;
-          margin-bottom: 10pt;
+          margin-bottom: 8pt;
         }
         .skills-category {
           font-weight: bold;
-          font-size: 10pt;
-          color: #111111;
-          width: 130pt;
+          font-size: 9.5pt;
+          color: ${bodyTextColor};
+          width: 120pt;
           vertical-align: top;
           padding-bottom: 3pt;
         }
         .skills-list {
-          font-size: 10pt;
-          color: #374151;
+          font-size: 9.5pt;
+          color: ${bodyTextColor};
           vertical-align: top;
           padding-bottom: 3pt;
         }
         .plain-list {
           margin: 0 0 8pt 0;
-          padding-left: 15pt;
+          padding-left: 14pt;
         }
         .plain-list li {
           margin-bottom: 2pt;
-          font-size: 10pt;
-          color: #374151;
+          font-size: 9.5pt;
+          color: ${bodyTextColor};
         }
       </style>
     `;
+
+    const renderContactHtml = () => `
+      <div class="contact-row">
+        ${personal.email ? `<span class="contact-item"><b>Email:</b> ${personal.email}</span>` : ""}
+        ${personal.phone ? `<span class="contact-item"><b>Phone:</b> ${personal.phone}</span>` : ""}
+        ${personal.location ? `<span class="contact-item"><b>Location:</b> ${personal.location}</span>` : ""}
+        ${personal.website ? `<span class="contact-item"><b>Website:</b> ${personal.website}</span>` : ""}
+        ${personal.linkedin ? `<span class="contact-item"><b>LinkedIn:</b> ${personal.linkedin}</span>` : ""}
+        ${personal.github ? `<span class="contact-item"><b>GitHub:</b> ${personal.github}</span>` : ""}
+      </div>
+    `;
+
+    const renderMainBody = () => {
+      let content = "";
+      if (summary) {
+        content += `
+          <div class="section-title">Professional Summary</div>
+          <div class="summary">${summary}</div>
+        `;
+      }
+      if (experience && experience.length > 0) {
+        content += `<div class="section-title">Work Experience</div>`;
+        experience.forEach(exp => {
+          const dateStr = `${exp.startDate || "Start"} - ${exp.current ? "Present" : exp.endDate || "End"}`;
+          content += `
+            <div class="item-row">
+              <span class="item-date">${dateStr}</span>
+              <span class="item-title">${exp.role || "Role Title"}</span> <span style="font-weight: normal;">at</span> <span class="item-company">${exp.company || "Company"}</span>
+            </div>
+            <div class="item-meta">${exp.location || "Location"}</div>
+            <ul class="bullets">
+              ${exp.bullets.map(b => `<li>${b || "Bullet achievement point..."}</li>`).join("")}
+            </ul>
+          `;
+        });
+      }
+      if (projects && projects.length > 0) {
+        content += `<div class="section-title">Key Projects</div>`;
+        projects.forEach(proj => {
+          content += `
+            <div class="item-row">
+              ${proj.techStack ? `<span class="item-date"><i>${proj.techStack}</i></span>` : ""}
+              <span class="item-title">${proj.title || "Project Title"}</span>
+              ${proj.link ? ` | <span style="font-size: 9pt; color: ${brandAccent};">${proj.link}</span>` : ""}
+            </div>
+            <ul class="bullets" style="margin-top: 2pt;">
+              ${proj.bullets.map(b => `<li>${b || "Project milestone..."}</li>`).join("")}
+            </ul>
+          `;
+        });
+      }
+      if (education && education.length > 0) {
+        content += `<div class="section-title">Education</div>`;
+        education.forEach(edu => {
+          content += `
+            <div class="item-row">
+              <span class="item-date">${edu.graduationDate || ""}</span>
+              <span class="item-title">${edu.degree || "Degree"} in ${edu.field || "Field of Study"}</span>
+            </div>
+            <div class="item-meta">
+              ${edu.school || "School / University"}${edu.location ? `, ${edu.location}` : ""}
+              ${edu.gpa ? ` | <b>GPA:</b> ${edu.gpa}` : ""}
+            </div>
+          `;
+        });
+      }
+      const validSkills = skills.filter(cat => cat.skills.length > 0);
+      if (validSkills.length > 0) {
+        content += `<div class="section-title">Skills & Expertise</div>`;
+        content += `<table class="skills-table">`;
+        validSkills.forEach(cat => {
+          content += `
+            <tr>
+              <td class="skills-category">${cat.categoryName}:</td>
+              <td class="skills-list">${cat.skills.join(", ")}</td>
+            </tr>
+          `;
+        });
+        content += `</table>`;
+      }
+      if (certifications && certifications.length > 0) {
+        content += `
+          <div class="section-title">Certifications</div>
+          <ul class="plain-list">
+            ${certifications.map(cert => `<li>${cert}</li>`).join("")}
+          </ul>
+        `;
+      }
+      if (languages && languages.length > 0) {
+        content += `
+          <div class="section-title">Languages</div>
+          <ul class="plain-list">
+            ${languages.map(lang => `<li>${lang}</li>`).join("")}
+          </ul>
+        `;
+      }
+      return content;
+    };
 
     let htmlBody = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
@@ -1562,106 +1691,62 @@ export default function App() {
       </head>
       <body>
         <div>
-          <h1>${personal.fullName || "Your Name"}</h1>
-          <div class="subtitle">${personal.title || "Target Professional Title"}</div>
-          
-          <div class="contact-row">
-            ${personal.email ? `<span class="contact-item"><b>Email:</b> ${personal.email}</span>` : ""}
-            ${personal.phone ? `<span class="contact-item"><b>Phone:</b> ${personal.phone}</span>` : ""}
-            ${personal.location ? `<span class="contact-item"><b>Location:</b> ${personal.location}</span>` : ""}
-            ${personal.website ? `<span class="contact-item"><b>Website:</b> ${personal.website}</span>` : ""}
-            ${personal.linkedin ? `<span class="contact-item"><b>LinkedIn:</b> ${personal.linkedin}</span>` : ""}
-            ${personal.github ? `<span class="contact-item"><b>GitHub:</b> ${personal.github}</span>` : ""}
-          </div>
     `;
 
-    if (summary) {
+    if (resumeStyle === "brutalist") {
       htmlBody += `
-        <div class="section-title">Professional Summary</div>
-        <div class="summary">${summary}</div>
+        <div style="background-color: #fde047; border: 3px solid #000; padding: 12pt; margin-bottom: 14pt;">
+          <h1 style="color: #000;">${personal.fullName || "Your Name"}</h1>
+          <div style="font-weight: bold; background: #fff; border: 2px solid #000; padding: 2pt 6pt; display: inline-block; text-transform: uppercase;">
+            ${personal.title || "Target Professional Title"}
+          </div>
+        </div>
+        ${renderContactHtml()}
+        ${renderMainBody()}
       `;
-    }
-
-    if (experience && experience.length > 0) {
-      htmlBody += `<div class="section-title">Work Experience</div>`;
-      experience.forEach(exp => {
-        const dateStr = `${exp.startDate || "Start"} - ${exp.current ? "Present" : exp.endDate || "End"}`;
-        htmlBody += `
-          <div class="item-row">
-            <span class="item-date">${dateStr}</span>
-            <span class="item-title">${exp.role || "Role Title"}</span> <span style="font-weight: normal; color: #6b7280;">at</span> <span class="item-company">${exp.company || "Company"}</span>
-          </div>
-          <div class="item-meta">${exp.location || "Location"}</div>
-          <ul class="bullets">
-            ${exp.bullets.map(b => `<li>${b || "Bullet achievement point..."}</li>`).join("")}
-          </ul>
-        `;
-      });
-    }
-
-    if (projects && projects.length > 0) {
-      htmlBody += `<div class="section-title">Key Projects</div>`;
-      projects.forEach(proj => {
-        htmlBody += `
-          <div class="item-row">
-            ${proj.techStack ? `<span class="item-date"><i>${proj.techStack}</i></span>` : ""}
-            <span class="item-title">${proj.title || "Project Title"}</span>
-            ${proj.link ? ` | <span style="font-size: 9pt; color: #b45309;">${proj.link}</span>` : ""}
-          </div>
-          <ul class="bullets" style="margin-top: 3pt;">
-            ${proj.bullets.map(b => `<li>${b || "Project milestone..."}</li>`).join("")}
-          </ul>
-        `;
-      });
-    }
-
-    if (education && education.length > 0) {
-      htmlBody += `<div class="section-title">Education</div>`;
-      education.forEach(edu => {
-        htmlBody += `
-          <div class="item-row">
-            <span class="item-date">${edu.graduationDate || ""}</span>
-            <span class="item-title">${edu.degree || "Degree"} in ${edu.field || "Field of Study"}</span>
-          </div>
-          <div class="item-meta">
-            ${edu.school || "School / University"}${edu.location ? `, ${edu.location}` : ""}
-            ${edu.gpa ? ` | <b>GPA:</b> ${edu.gpa}` : ""}
-          </div>
-          <div style="height: 4pt;"></div>
-        `;
-      });
-    }
-
-    const validSkills = skills.filter(cat => cat.skills.length > 0);
-    if (validSkills.length > 0) {
-      htmlBody += `<div class="section-title">Skills & Expertise</div>`;
-      htmlBody += `<table class="skills-table">`;
-      validSkills.forEach(cat => {
-        htmlBody += `
+    } else if (resumeStyle === "creative" || resumeStyle === "profile-photo") {
+      // 2-Column Side-by-Side Table for Creative & Profile-Photo templates in DOCX
+      const validSkills = skills.filter(cat => cat.skills.length > 0);
+      htmlBody += `
+        <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
           <tr>
-            <td class="skills-category">${cat.categoryName}:</td>
-            <td class="skills-list">${cat.skills.join(", ")}</td>
+            <td style="width: 32%; vertical-align: top; padding-right: 14pt; border-right: 1.5px solid ${brandAccent};">
+              ${personal.photoUrl ? `<div style="text-align: center; margin-bottom: 10pt;"><img src="${personal.photoUrl}" width="100" height="100" style="border-radius: 50%;" /></div>` : ""}
+              <h1 style="font-size: 16pt;">${personal.fullName || "Your Name"}</h1>
+              <div class="subtitle" style="font-size: 10pt;">${personal.title || "Target Title"}</div>
+              <div style="font-size: 9pt; color: #4b5563; margin-bottom: 12pt;">
+                ${personal.email ? `<div><b>Email:</b> ${personal.email}</div>` : ""}
+                ${personal.phone ? `<div><b>Phone:</b> ${personal.phone}</div>` : ""}
+                ${personal.location ? `<div><b>Loc:</b> ${personal.location}</div>` : ""}
+                ${personal.website ? `<div><b>Web:</b> ${personal.website}</div>` : ""}
+                ${personal.linkedin ? `<div><b>LinkedIn:</b> ${personal.linkedin}</div>` : ""}
+              </div>
+              ${validSkills.length > 0 ? `
+                <div class="section-title" style="font-size: 9.5pt;">Skills</div>
+                ${validSkills.map(c => `<div style="font-size: 9pt; margin-bottom: 4pt;"><b>${c.categoryName}:</b><br/>${c.skills.join(", ")}</div>`).join("")}
+              ` : ""}
+              ${certifications.length > 0 ? `
+                <div class="section-title" style="font-size: 9.5pt;">Certifications</div>
+                <ul class="plain-list" style="padding-left: 10pt;">${certifications.map(c => `<li style="font-size: 8.5pt;">${c}</li>`).join("")}</ul>
+              ` : ""}
+              ${languages.length > 0 ? `
+                <div class="section-title" style="font-size: 9.5pt;">Languages</div>
+                <ul class="plain-list" style="padding-left: 10pt;">${languages.map(l => `<li style="font-size: 8.5pt;">${l}</li>`).join("")}</ul>
+              ` : ""}
+            </td>
+            <td style="width: 68%; vertical-align: top; padding-left: 14pt;">
+              ${renderMainBody()}
+            </td>
           </tr>
-        `;
-      });
-      htmlBody += `</table>`;
-    }
-
-    if (certifications && certifications.length > 0) {
-      htmlBody += `
-        <div class="section-title">Certifications</div>
-        <ul class="plain-list">
-          ${certifications.map(cert => `<li>${cert}</li>`).join("")}
-        </ul>
+        </table>
       `;
-    }
-
-    if (languages && languages.length > 0) {
+    } else {
+      // Single-column templates (modern, classic, executive, tech, academic, healthcare, future, slate, chic, etc.)
       htmlBody += `
-        <div class="section-title">Languages</div>
-        <ul class="plain-list">
-          ${languages.map(lang => `<li>${lang}</li>`).join("")}
-        </ul>
+        <h1>${personal.fullName || "Your Name"}</h1>
+        <div class="subtitle">${personal.title || "Target Professional Title"}</div>
+        ${renderContactHtml()}
+        ${renderMainBody()}
       `;
     }
 
@@ -1678,12 +1763,12 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${(personal.fullName || "Resume").replace(/\s+/g, "_")}_Resume.doc`;
+    a.download = `${(personal.fullName || "Resume").replace(/\s+/g, "_")}_${resumeStyle.toUpperCase()}_Resume.doc`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast("Word document download started successfully!", "success");
+    showToast(`Word document exported in ${resumeStyle.toUpperCase()} template!`, "success");
   };
 
   // ================= NEW OVERLAY RESUME ENGINE HELPER FUNCTIONS =================
@@ -2246,22 +2331,33 @@ export default function App() {
       {/* Main Container */}
       <div className={`max-w-[1700px] mx-auto px-4 md:px-6 lg:px-8 py-5 ${showCoverLetterModal ? "no-print" : ""}`}>
         {/* Navigation Bar */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between p-4.5 bg-white/50 backdrop-blur border border-white/30 rounded-2xl mb-6 gap-4 no-print shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#5C2018] border border-[#BC4639]/30 rounded-xl shadow-sm text-white p-2.5 flex items-center justify-center">
-              <FileText className="h-6 w-6 stroke-[2.5]" />
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between p-3.5 sm:p-4.5 bg-white/50 backdrop-blur border border-white/30 rounded-2xl mb-4 sm:mb-6 gap-3 sm:gap-4 no-print shadow-sm">
+          <div className="flex items-center justify-between w-full md:w-auto">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="bg-[#5C2018] border border-[#BC4639]/30 rounded-xl shadow-sm text-white p-2 sm:p-2.5 flex items-center justify-center">
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6 stroke-[2.5]" />
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-2xl font-serif font-black tracking-tight text-[#5C2018] flex items-center gap-1.5">
+                  CareerWith <span className="text-[#BC4639] font-bold text-[10px] sm:text-xs bg-[#BC4639]/10 border border-[#BC4639]/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-sans">Studio</span>
+                </h1>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-serif font-black tracking-tight text-[#5C2018] flex items-center gap-1.5">
-                CareerWith <span className="text-[#BC4639] font-bold text-xs bg-[#BC4639]/10 border border-[#BC4639]/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-sans">Resume Studio</span>
-              </h1>
-            </div>
+
+            {/* Mobile Navigation Hamburger Toggle */}
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="md:hidden px-3 py-1.5 rounded-xl bg-white border border-[#D4A59A]/50 text-[#5C2018] font-bold text-xs flex items-center gap-1 shadow-sm cursor-pointer"
+            >
+              <span>{mobileNavOpen ? "Close ✕" : "Menu ☰"}</span>
+            </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className={`${mobileNavOpen ? "flex" : "hidden"} md:flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-[#D4A59A]/30`}>
             <button
-              onClick={() => setShowEntrancePage(true)}
-              className="flex items-center gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
+              onClick={() => { setShowEntrancePage(true); setMobileNavOpen(false); }}
+              className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
             >
               <span className="p-1 rounded-lg bg-white text-[#5C2018] border border-[#D4A59A]/30 flex items-center justify-center shrink-0">
                 <span className="text-xs">🏠</span>
@@ -2272,8 +2368,9 @@ export default function App() {
               onClick={() => {
                 setJsonCodeText(JSON.stringify(resume, null, 2));
                 setShowJsonModal(true);
+                setMobileNavOpen(false);
               }}
-              className="flex items-center gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
+              className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
             >
               <span className="p-1 rounded-lg bg-white text-[#5C2018] border border-[#D4A59A]/30 flex items-center justify-center shrink-0">
                 <FileText className="h-3.5 w-3.5" />
@@ -2281,8 +2378,8 @@ export default function App() {
               JSON Editor 💻
             </button>
             <button
-              onClick={handleLoadDemo}
-              className="flex items-center gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
+              onClick={() => { handleLoadDemo(); setMobileNavOpen(false); }}
+              className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold bg-[#D4A59A]/20 hover:bg-[#D4A59A]/35 text-[#5C2018] px-3 py-2 rounded-xl border border-[#D4A59A]/40 shadow-sm transition-all cursor-pointer"
             >
               <span className="p-1 rounded-lg bg-white text-[#5C2018] border border-[#D4A59A]/30 flex items-center justify-center shrink-0">
                 <RotateCcw className="h-3.5 w-3.5" />
@@ -2290,8 +2387,8 @@ export default function App() {
               Demo Data
             </button>
             <button
-              onClick={handleReset}
-              className="flex items-center gap-2 text-xs font-bold bg-[#BC4639]/10 hover:bg-[#BC4639]/20 text-[#BC4639] px-3 py-2 rounded-xl border border-[#BC4639]/25 shadow-sm transition-all cursor-pointer"
+              onClick={() => { handleReset(); setMobileNavOpen(false); }}
+              className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold bg-[#BC4639]/10 hover:bg-[#BC4639]/20 text-[#BC4639] px-3 py-2 rounded-xl border border-[#BC4639]/25 shadow-sm transition-all cursor-pointer"
             >
               <span className="p-1 rounded-lg bg-white text-[#BC4639] border border-[#BC4639]/20 flex items-center justify-center shrink-0">
                 <Trash2 className="h-3.5 w-3.5" />
@@ -2299,8 +2396,8 @@ export default function App() {
               Reset Form
             </button>
             <button
-              onClick={() => setShowATSModal(true)}
-              className="flex items-center gap-2 text-xs font-bold bg-[#5C2018] hover:bg-[#5C2018]/90 text-[#F3E0DC] px-3.5 py-2 rounded-xl border border-[#BC4639]/20 shadow-sm transition-all cursor-pointer"
+              onClick={() => { setShowATSModal(true); setMobileNavOpen(false); }}
+              className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold bg-[#5C2018] hover:bg-[#5C2018]/90 text-[#F3E0DC] px-3.5 py-2 rounded-xl border border-[#BC4639]/20 shadow-sm transition-all cursor-pointer"
             >
               <span className="p-1 rounded-lg bg-[#5C2018]/50 text-[#F3E0DC] border border-[#BC4639]/30 flex items-center justify-center shrink-0">
                 <TrendingUp className="h-3.5 w-3.5" />
@@ -2308,8 +2405,8 @@ export default function App() {
               ATS Score Scanner
             </button>
             <button
-              onClick={() => setShowCoverLetterModal(true)}
-              className="flex items-center gap-2 text-xs font-bold bg-[#4285F4] hover:bg-[#357AE8] text-white px-3.5 py-2 rounded-xl border border-blue-600/30 shadow-md transition-all cursor-pointer"
+              onClick={() => { setShowCoverLetterModal(true); setMobileNavOpen(false); }}
+              className="flex items-center justify-center sm:justify-start gap-2 text-xs font-bold bg-[#4285F4] hover:bg-[#357AE8] text-white px-3.5 py-2 rounded-xl border border-blue-600/30 shadow-md transition-all cursor-pointer"
             >
               <span className="p-1 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
                 <Wand2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -2319,11 +2416,41 @@ export default function App() {
           </div>
         </header>
 
+        {/* Sticky Mobile Workspace View Switcher (Visible on screens < xl) */}
+        <div className="xl:hidden sticky top-2 z-30 bg-[#5C2018] text-white p-1.5 rounded-2xl border border-[#BC4639]/30 shadow-xl flex items-center justify-between gap-1.5 mb-5 no-print">
+          <button
+            type="button"
+            onClick={() => setMobileActiveTab("editor")}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              mobileActiveTab === "editor"
+                ? "bg-[#F3E0DC] text-[#5C2018] shadow-md scale-[1.02]"
+                : "text-[#D4A59A] hover:text-white"
+            }`}
+          >
+            <FileText className="h-4 w-4 shrink-0" />
+            <span>1. Edit Details</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileActiveTab("preview")}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              mobileActiveTab === "preview"
+                ? "bg-[#4285F4] text-white shadow-md scale-[1.02]"
+                : "text-[#D4A59A] hover:text-white"
+            }`}
+          >
+            <Eye className="h-4 w-4 shrink-0" />
+            <span>2. Paper Preview</span>
+          </button>
+        </div>
+
         {/* Workspace Layout Split */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
           
           {/* LEFT: Creator Wizard (xl:col-span-5) */}
-          <section className="xl:col-span-5 bg-white/80 backdrop-blur border border-white/30 rounded-3xl shadow-sm p-5 md:p-6 sticky top-5 max-h-[calc(100vh-140px)] overflow-y-auto no-print relative z-10 transition-all duration-300">
+          <section className={`xl:col-span-5 bg-white/80 backdrop-blur border border-white/30 rounded-3xl shadow-sm p-4 sm:p-5 md:p-6 sticky top-5 max-h-[calc(100vh-140px)] overflow-y-auto no-print relative z-10 transition-all duration-300 ${
+            mobileActiveTab === "editor" ? "block" : "hidden xl:block"
+          }`}>
             
             {/* AI Career Co-Pilot Section */}
             <div className="mb-6 bg-[#D4A59A]/15 border border-[#BC4639]/20 rounded-2xl shadow-sm p-4">
@@ -3588,7 +3715,9 @@ export default function App() {
           </section>
 
           {/* RIGHT: Document Real-Time Live Preview (xl:col-span-7) */}
-          <section className="xl:col-span-7 space-y-4">
+          <section className={`xl:col-span-7 space-y-4 ${
+            mobileActiveTab === "preview" ? "block" : "hidden xl:block"
+          }`}>
             
             {/* Real-time controls bar */}
             <div className="bg-white/45 backdrop-blur-xl border border-white/60 p-4 rounded-3xl shadow-neomorphic flex flex-col md:flex-row md:items-center justify-between gap-4 no-print transition-all duration-300 relative z-10">
@@ -3655,7 +3784,11 @@ export default function App() {
             </div>
 
             {/* Resume Letter A4 Frame Container */}
-            <div className="print-wrapper bg-stone-100 p-2 md:p-4 rounded-3xl border border-stone-200 shadow-inner overflow-x-auto">
+            <div className="print-wrapper bg-stone-100 p-2 sm:p-4 rounded-3xl border border-stone-200 shadow-inner overflow-x-auto w-full">
+              {/* Mobile Touch Pan Tip */}
+              <div className="xl:hidden text-[10px] text-stone-500 font-bold text-center pb-2 flex items-center justify-center gap-1">
+                <span>← Swipe or scroll horizontally to pan paper preview →</span>
+              </div>
               
               {/* Document Paper Container */}
               <div
